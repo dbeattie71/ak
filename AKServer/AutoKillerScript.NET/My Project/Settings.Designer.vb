@@ -53,16 +53,6 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.WebServiceUrl),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("http://webservices.autokiller.com/AutokillerWebService/rsa.asmx")>  _
-        Public ReadOnly Property AutoKillerScript_com_autokiller_webservices_Encrypt() As String
-            Get
-                Return CType(Me("AutoKillerScript_com_autokiller_webservices_Encrypt"),String)
-            End Get
-        End Property
     End Class
 End Namespace
 

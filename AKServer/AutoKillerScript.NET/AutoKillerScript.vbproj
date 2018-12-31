@@ -65,7 +65,6 @@
   <ItemGroup>
     <Compile Include="AutoKillerScript.vb" />
     <Compile Include="CIniFile.vb" />
-    <Compile Include="Encrypt.vb" />
     <Compile Include="Keys.vb" />
     <Compile Include="MailSlot.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -85,11 +84,6 @@
     </Compile>
     <Compile Include="RemoteClasses.vb" />
     <Compile Include="Socket.vb" />
-    <Compile Include="Web References\autokillerwebservice\Reference.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.map</DependentUpon>
-    </Compile>
     <Compile Include="WManager.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -110,32 +104,10 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <None Include="Web References\autokillerwebservice\rsa.wsdl" />
-  </ItemGroup>
-  <ItemGroup>
-    <WebReferences Include="Web References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WebReferenceUrl Include="http://webservices.autokiller.com/AutokillerWebService/rsa.asmx">
-      <UrlBehavior>Dynamic</UrlBehavior>
-      <RelPath>Web References\autokillerwebservice\</RelPath>
-      <UpdateFromURL>http://webservices.autokiller.com/AutokillerWebService/rsa.asmx</UpdateFromURL>
-      <ServiceLocationURL>
-      </ServiceLocationURL>
-      <CachedDynamicPropName>
-      </CachedDynamicPropName>
-      <CachedAppSettingsObjectName>MySettings</CachedAppSettingsObjectName>
-      <CachedSettingsPropName>AutoKillerScript_com_autokiller_webservices_Encrypt</CachedSettingsPropName>
-    </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="keyPair.snk" />
-    <None Include="Web References\autokillerwebservice\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.vb</LastGenOutput>
-    </None>
-    <None Include="Web References\autokillerwebservice\rsa.disco" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AKServer\AKServer.DLL.vbproj">

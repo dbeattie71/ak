@@ -3951,8 +3951,9 @@ Public NotInheritable Class clsAutoKillerScript
 
         Running = False
 
-        Dim xml As New Encrypter
-        xml.LogUserOut(mRegKey)
+        'DGB
+        'Dim xml As New Encrypter
+        'xml.LogUserOut(mRegKey)
 
         CleanUpRemoting()
 
@@ -4323,71 +4324,76 @@ Public NotInheritable Class clsAutoKillerScript
     End Sub
 
     Private Function LoadMemLocs() As Boolean
-        Dim xml As New Encrypter
-        Dim iFile As New XmlDocument
-        Dim N As XmlElement = Nothing
-        Dim item As XmlElement
-        Dim temp As String
+        'DGB
+        'Dim xml As New Encrypter
+        'Dim iFile As New XmlDocument
+        'Dim N As XmlElement = Nothing
+        'Dim item As XmlElement
+        'Dim temp As String
 
-        Try
-            iFile.Load(xml.GetXML(mRegKey))
-            If Not mEuro Then
-                If mCAT Then
-                    N = DirectCast(iFile.SelectSingleNode("//section[@name='USCATACOMBS']"), XmlElement)
-                ElseIf mToA Then
-                    N = DirectCast(iFile.SelectSingleNode("//section[@name='USTRIALSOFATLANTIS']"), XmlElement)
-                ElseIf mDR Then
-                    N = DirectCast(iFile.SelectSingleNode("//section[@name='USDARKNESSRISING']"), XmlElement)
-                End If
-            Else
-                If mCAT Then
-                    N = DirectCast(iFile.SelectSingleNode("//section[@name='EUROCATACOMBS']"), XmlElement)
-                ElseIf mToA Then
-                    N = DirectCast(iFile.SelectSingleNode("//section[@name='EUROTRIALSOFATLANTIS']"), XmlElement)
-                ElseIf mDR Then
-                    N = DirectCast(iFile.SelectSingleNode("//section[@name='EURODARKNESSRISING']"), XmlElement)
-                End If
-            End If
+        'Try
+        '    iFile.Load(xml.GetXML(mRegKey))
+        '    If Not mEuro Then
+        '        If mCAT Then
+        '            N = DirectCast(iFile.SelectSingleNode("//section[@name='USCATACOMBS']"), XmlElement)
+        '        ElseIf mToA Then
+        '            N = DirectCast(iFile.SelectSingleNode("//section[@name='USTRIALSOFATLANTIS']"), XmlElement)
+        '        ElseIf mDR Then
+        '            N = DirectCast(iFile.SelectSingleNode("//section[@name='USDARKNESSRISING']"), XmlElement)
+        '        End If
+        '    Else
+        '        If mCAT Then
+        '            N = DirectCast(iFile.SelectSingleNode("//section[@name='EUROCATACOMBS']"), XmlElement)
+        '        ElseIf mToA Then
+        '            N = DirectCast(iFile.SelectSingleNode("//section[@name='EUROTRIALSOFATLANTIS']"), XmlElement)
+        '        ElseIf mDR Then
+        '            N = DirectCast(iFile.SelectSingleNode("//section[@name='EURODARKNESSRISING']"), XmlElement)
+        '        End If
+        '    End If
 
-            item = DirectCast(N.SelectSingleNode("item[@key='TargetIndexAddress']"), XmlElement)
-            If (item IsNot Nothing) Then
-                temp = item.GetAttribute("newValue")
-                TargetIndexAddress = CInt(Encrypt(temp))
-            End If
+        '    item = DirectCast(N.SelectSingleNode("item[@key='TargetIndexAddress']"), XmlElement)
+        '    If (item IsNot Nothing) Then
+        '        temp = item.GetAttribute("newValue")
+        '        TargetIndexAddress = CInt(Encrypt(temp))
+        '    End If
 
-            item = DirectCast(N.SelectSingleNode("item[@key='RunningAddress']"), XmlElement)
-            If (item IsNot Nothing) Then
-                temp = item.GetAttribute("newValue")
-                RunningAddress = CInt(Encrypt(temp))
-            End If
+        '    item = DirectCast(N.SelectSingleNode("item[@key='RunningAddress']"), XmlElement)
+        '    If (item IsNot Nothing) Then
+        '        temp = item.GetAttribute("newValue")
+        '        RunningAddress = CInt(Encrypt(temp))
+        '    End If
 
-            item = DirectCast(N.SelectSingleNode("item[@key='LocalPlayerInfo']"), XmlElement)
-            If (item IsNot Nothing) Then
-                temp = item.GetAttribute("newValue")
-                LocalPlayerInfo = CInt(Encrypt(temp))
-            End If
+        '    item = DirectCast(N.SelectSingleNode("item[@key='LocalPlayerInfo']"), XmlElement)
+        '    If (item IsNot Nothing) Then
+        '        temp = item.GetAttribute("newValue")
+        '        LocalPlayerInfo = CInt(Encrypt(temp))
+        '    End If
 
-            Return True
+        '    Return True
 
-        Catch ex As Exception
-            LogF(ex.Message)
-            LogF("Error logging in, you need a valid registration code to use.")
-            Return False
-        End Try
+        'Catch ex As Exception
+        '    LogF(ex.Message)
+        '    LogF("Error logging in, you need a valid registration code to use.")
+        '    Return False
+        'End Try
+
+        'TODO set locations
+        return True
 
     End Function
 
-    Private Function Encrypt(ByRef xSrc As String) As String
-        Dim masterString, sChar As String
-        Dim L, I As Integer
-        masterString = "WriteProcessMemory" ' use any string you want
-        L = (masterString).Length
-        For I = 1 To (xSrc).Length
-            sChar = (Asc((masterString).Substring((I Mod L) - L * CShort((I Mod L) = 0), 1))).ToString()
-            Mid(xSrc, I, 1) = Chr(Asc(Mid(xSrc, I, 1)) Xor CInt(sChar))
-        Next
-        Encrypt = xSrc
-    End Function
+    'DGB
+    'Private Function Encrypt(ByRef xSrc As String) As String
+    '    Dim masterString, sChar As String
+    '    Dim L, I As Integer
+    '    masterString = "WriteProcessMemory" ' use any string you want
+    '    L = (masterString).Length
+    '    For I = 1 To (xSrc).Length
+    '        sChar = (Asc((masterString).Substring((I Mod L) - L * CShort((I Mod L) = 0), 1))).ToString()
+    '        Mid(xSrc, I, 1) = Chr(Asc(Mid(xSrc, I, 1)) Xor CInt(sChar))
+    '    Next
+    '    Encrypt = xSrc
+    'End Function
 
 #End Region
 
