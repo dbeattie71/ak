@@ -1,326 +1,230 @@
-<VisualStudioProject>
-    <CSHARP
-        ProjectType = "Local"
-        ProductVersion = "7.10.3077"
-        SchemaVersion = "2.0"
-        ProjectGuid = "{FC7BFBFB-AFBE-4316-97B4-4661487E0567}"
-    >
-        <Build>
-            <Settings
-                ApplicationIcon = "App.ico"
-                AssemblyKeyContainerName = ""
-                AssemblyName = "DAoCBot"
-                AssemblyOriginatorKeyFile = ""
-                DefaultClientScript = "JScript"
-                DefaultHTMLPageLayout = "Grid"
-                DefaultTargetSchema = "IE50"
-                DelaySign = "false"
-                OutputType = "WinExe"
-                PreBuildEvent = ""
-                PostBuildEvent = ""
-                RootNamespace = "DAoCBot"
-                RunPostBuildEvent = "OnBuildSuccess"
-                StartupObject = ""
-            >
-                <Config
-                    Name = "Debug"
-                    AllowUnsafeBlocks = "false"
-                    BaseAddress = "285212672"
-                    CheckForOverflowUnderflow = "false"
-                    ConfigurationOverrideFile = ""
-                    DefineConstants = "DEBUG;TRACE"
-                    DocumentationFile = ""
-                    DebugSymbols = "true"
-                    FileAlignment = "4096"
-                    IncrementalBuild = "false"
-                    NoStdLib = "false"
-                    NoWarn = ""
-                    Optimize = "false"
-                    OutputPath = "bin\Debug\"
-                    RegisterForComInterop = "false"
-                    RemoveIntegerChecks = "false"
-                    TreatWarningsAsErrors = "false"
-                    WarningLevel = "4"
-                />
-                <Config
-                    Name = "Release"
-                    AllowUnsafeBlocks = "false"
-                    BaseAddress = "285212672"
-                    CheckForOverflowUnderflow = "false"
-                    ConfigurationOverrideFile = ""
-                    DefineConstants = "TRACE"
-                    DocumentationFile = ""
-                    DebugSymbols = "false"
-                    FileAlignment = "4096"
-                    IncrementalBuild = "false"
-                    NoStdLib = "false"
-                    NoWarn = ""
-                    Optimize = "true"
-                    OutputPath = "bin\Release\"
-                    RegisterForComInterop = "false"
-                    RemoveIntegerChecks = "false"
-                    TreatWarningsAsErrors = "false"
-                    WarningLevel = "4"
-                />
-            </Settings>
-            <References>
-                <Reference
-                    Name = "System"
-                    AssemblyName = "System"
-                    HintPath = "..\..\..\..\..\..\WINNT\Microsoft.NET\Framework\v1.1.4322\System.dll"
-                />
-                <Reference
-                    Name = "System.Data"
-                    AssemblyName = "System.Data"
-                    HintPath = "..\..\..\..\..\..\WINNT\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
-                />
-                <Reference
-                    Name = "System.Drawing"
-                    AssemblyName = "System.Drawing"
-                    HintPath = "..\..\..\..\..\..\WINNT\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll"
-                />
-                <Reference
-                    Name = "System.Windows.Forms"
-                    AssemblyName = "System.Windows.Forms"
-                    HintPath = "..\..\..\..\..\..\WINNT\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
-                />
-                <Reference
-                    Name = "System.XML"
-                    AssemblyName = "System.Xml"
-                    HintPath = "..\..\..\..\..\..\WINNT\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
-                />
-                <Reference
-                    Name = "AKServer.DLL"
-                    AssemblyName = "AKServer.DLL"
-                    HintPath = "..\..\..\..\..\..\Program Files\AutoKiller\AutoKiller Server\AKServer.DLL.dll"
-                    AssemblyFolderKey = "hklm\dn\autokillerserver"
-                />
-                <Reference
-                    Name = "AutoKillerScript"
-                    AssemblyName = "AutoKillerScript"
-                    HintPath = "..\..\..\..\..\..\Program Files\AutoKiller\AutoKiller Script\AutoKillerScript.dll"
-                    AssemblyFolderKey = "hklm\dn\autokillerscript"
-                />
-            </References>
-        </Build>
-        <Files>
-            <Include>
-                <File
-                    RelPath = "App.ico"
-                    BuildAction = "Content"
-                />
-                <File
-                    RelPath = "AssemblyInfo.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "BotBase.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "BotQueue.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Cooldowns.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "DAoCNecro.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "DAoCScout.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "fmrMain.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "fmrMain.resx"
-                    DependentUpon = "fmrMain.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmAdvanced.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmAdvanced.resx"
-                    DependentUpon = "frmAdvanced.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmDistances.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmDistances.resx"
-                    DependentUpon = "frmDistances.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmFlee.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmFlee.resx"
-                    DependentUpon = "frmFlee.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmGeneral.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmGeneral.resx"
-                    DependentUpon = "frmGeneral.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmLoot.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmLoot.resx"
-                    DependentUpon = "frmLoot.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmNecroSettings.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmNecroSettings.resx"
-                    DependentUpon = "frmNecroSettings.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmNewPatrolArea.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmNewPatrolArea.resx"
-                    DependentUpon = "frmNewPatrolArea.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmNewProfile.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmNewProfile.resx"
-                    DependentUpon = "frmNewProfile.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmPatrolArea.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmPatrolArea.resx"
-                    DependentUpon = "frmPatrolArea.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmRest.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmRest.resx"
-                    DependentUpon = "frmRest.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmScoutSettings.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmScoutSettings.resx"
-                    DependentUpon = "frmScoutSettings.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmStatistics.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmStatistics.resx"
-                    DependentUpon = "frmStatistics.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmTravel.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmTravel.resx"
-                    DependentUpon = "frmTravel.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmTravelPath.cs"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmTravelPath.resx"
-                    DependentUpon = "frmTravelPath.cs"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "Interaction.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Localization.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "PatrolArea.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Profile.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "WAVSounds.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "Waypoint.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-            </Include>
-        </Files>
-    </CSHARP>
-</VisualStudioProject>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>7.10.3077</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FC7BFBFB-AFBE-4316-97B4-4661487E0567}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>App.ico</ApplicationIcon>
+    <AssemblyKeyContainerName />
+    <AssemblyName>DAoCBot</AssemblyName>
+    <AssemblyOriginatorKeyFile />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>DAoCBot</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject />
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>0.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile />
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile />
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn />
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile />
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile />
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn />
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AKServer.DLL">
+      <Name>AKServer.DLL</Name>
+      <HintPath>..\..\..\..\..\..\Program Files\AutoKiller\AutoKiller Server\AKServer.DLL.dll</HintPath>
+      <AssemblyFolderKey>hklm\dn\autokillerserver</AssemblyFolderKey>
+    </Reference>
+    <Reference Include="AutoKillerScript">
+      <Name>AutoKillerScript</Name>
+      <HintPath>..\..\..\..\..\..\Program Files\AutoKiller\AutoKiller Script\AutoKillerScript.dll</HintPath>
+      <AssemblyFolderKey>hklm\dn\autokillerscript</AssemblyFolderKey>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BotBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BotQueue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cooldowns.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DAoCNecro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DAoCScout.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="fmrMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAdvanced.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDistances.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFlee.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmGeneral.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmLoot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmNecroSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmNewPatrolArea.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmNewProfile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPatrolArea.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmScoutSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmStatistics.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTravel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTravelPath.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Interaction.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Localization.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PatrolArea.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Profile.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WAVSounds.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Waypoint.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Content Include="App.ico" />
+    <EmbeddedResource Include="fmrMain.resx">
+      <DependentUpon>fmrMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAdvanced.resx">
+      <DependentUpon>frmAdvanced.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDistances.resx">
+      <DependentUpon>frmDistances.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFlee.resx">
+      <DependentUpon>frmFlee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmGeneral.resx">
+      <DependentUpon>frmGeneral.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLoot.resx">
+      <DependentUpon>frmLoot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmNecroSettings.resx">
+      <DependentUpon>frmNecroSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmNewPatrolArea.resx">
+      <DependentUpon>frmNewPatrolArea.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmNewProfile.resx">
+      <DependentUpon>frmNewProfile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPatrolArea.resx">
+      <DependentUpon>frmPatrolArea.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRest.resx">
+      <DependentUpon>frmRest.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmScoutSettings.resx">
+      <DependentUpon>frmScoutSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmStatistics.resx">
+      <DependentUpon>frmStatistics.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTravel.resx">
+      <DependentUpon>frmTravel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTravelPath.resx">
+      <DependentUpon>frmTravelPath.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+</Project>
