@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<localization>
+	<strings>
+		<string id="pickupcontaineritem()" lang="en">PickupContainerItem({0},{1});</string>
+		<string id="deletecursoritem()" lang="en">DeleteCursorItem();</string>
+		<string id="food" lang="en">Food</string>
+		<string id="drink" lang="en">Drink</string>
+		<string id="skinning" lang="en">Skinning</string>
+		<string id="mining" lang="en">Find Minerals</string>
+		<string id="herbalism" lang="en">Find Herbs</string>
+		<string id="poisons" lang="en">Poisons</string>
+		<string id="instant poison" lang="en">Instant Poison</string>
+		<string id="wound poison" lang="en">Wound Poison</string>
+		<string id="deadly poison" lang="en">Deadly Poison</string>
+		<string id="mind-numbing poison" lang="en">Mind-numbing Poison</string>
+		<string id="crippling poison" lang="en">Crippling Poison</string>
+		<string id="sprint" lang="en">Sprint</string>
+		<string id="throw" lang="en">Throw</string>
+		<string id="lineofsight" lang="en">Target not in line of sight</string>
+		<string id="frostbolt" lang="en">Frostbolt</string>
+		<string id="fireball" lang="en">Fireball</string>
+		<string id="pyroblast" lang="en">Pyroblast</string>
+		<string id="arcane missiles" lang="en">Arcane Missiles</string>
+		<string id="scorch" lang="en">Scorch</string>
+		<string id="blast wave" lang="en">Blast Wave</string>
+		<string id="cone of cold" lang="en">Cone of Cold</string>
+		<string id="fire blast" lang="en">Fire Blast</string>
+		<string id="Frost Nova" lang="en">Frost Nova</string>
+		<string id="another action is in progress" lang="en">Another action is in progress</string>
+		<string id="you have no target." lang="en">You have no target.</string>
+		<string id="you are facing the wrong way" lang="en">You are facing the wrong way!</string>
+		<string id="spell is not ready yet." lang="en">Spell is not ready yet.</string>
+		<string id="target needs to be in front of you" lang="en">Target needs to be in front of you</string>
+		<string id="out of range." lang="en">Out of range.</string>
+		<string id="conjure water" lang="en">Conjure Water</string>
+		<string id="conjure food" lang="en">Conjure Food</string>
+		<string id="inventory full" lang="en">Inventory full</string>
+		<string id="inventory is full" lang="en">Inventory is full</string>
+		<string id="sitorstand()" lang="en">SitOrStand()</string>
+		<string id="spellstopcasting()" lang="en">SpellStopCasting()</string>
+		<string id="you are too far away" lang="en">You are too far away!</string>
+		<string id="attack" lang="en">Attack</string>
+		<string id="evasion" lang="en">Evasion</string>
+		<string id="gouge" lang="en">Gouge</string>
+		<string id="kick" lang="en">Kick</string>
+		<string id="eviscerate" lang="en">Eviscerate</string>
+		<string id="sinister strike" lang="en">Sinister Strike</string>
+		<string id="stealth" lang="en">Stealth</string>
+		<string id="shadowmeld" lang="en">Shadowmeld</string>
+		<string id="ghost" lang="en">Ghost</string>
+		<string id="mana shield" lang="en">Mana Shield</string>
+		<string id="hearthstone" lang="en">Hearthstone</string>
+		<string id="cheap shot" lang="en">Cheap Shot</string>
+		<string id="ambush" lang="en">Ambush</string>
+		<string id="First Aid" lang="en">First Aid</string>
+		<string id="Recently Bandaged" lang="en">Recently Bandaged</string>
+		<string id="Requires" lang="en">Requires</string>
+		<string id="coldblood" lang="en">Cold Blood</string>
+		<string id="war stomp" lang="en">War Stomp</string>
+		<string id="out of ammo" lang="en">Out of ammo.</string>
+		<string id="ammo needs to be" lang="en">Ammo needs to be in the paper doll ammo slot before it can be fired</string>
+		<string id="target too close" lang="en">Target too close</string>
+		<string id="target too close." lang="en">Target too close.</string>
+		<string id="cant do that while moving" lang="en">Can't do that while moving</string> 
+		<string id="revenge" lang="en">Revenge</string>
+		<string id="combat_xp_gain" lang="en">^(?&lt;monster&gt;.+) dies, you gain (?&lt;xp&gt;\d+) experience.(?: \(\+(?&lt;rested&gt;\d+) exp Rested bonus\)){0,1}</string>
+		<string id="garrote" lang="en">Garrote</string>
+		<string id="vanish" lang="en">Vanish</string>
+		<string id="shoot bow" lang="en">Shoot Bow</string>
+		<string id="shoot crossbow" lang="en">Shoot Crossbow</string>
+		<string id="shoot gun" lang="en">Shoot Gun</string>
+		<string id="backstab" lang="en">Backstab</string>
+		<string id="kidney shot" lang="en">Kidney Shot</string>
+		<string id="rupture" lang="en">Rupture</string>
+		<string id="slice and dice" lang="en">Slice and Dice</string>
+		<string id="preparation" lang="en">Preparation</string>
+		<string id="blade flurry" lang="en">Blade Flurry</string>
+		<string id="conjure mana agate" lang="en">Conjure Mana Agate</string>
+		<string id="conjure mana jade" lang="en">Conjure Mana Jade</string>
+		<string id="conjure mana citrin" lang="en">Conjure Mana Citrine</string>
+		<string id="conjure mana ruby" lang="en">Conjure Mana Ruby</string>
+		<string id="presence of mind" lang="en">Presence of Mind</string>
+		<string id="must have a dagger equipped" lang="en">Must have a Dagger equipped</string>
+		<string id="you must be behind your target" lang="en">You must be behind your target</string>		
+		<string id="must have a gun equipped" lang="en">Must have a Gun equipped</string>
+		<string id="must have a bow equipped" lang="en">Must have a Bow equipped</string>
+		<string id="must have a crossbow equipped" lang="en">Must have a Crossbow equipped</string>
+		<string id="must have a thrown equipped" lang="en">Must have a Thrown equipped</string>
+		<string id="wand" lang="en">Shoot</string>
+		<string id="Ice Barrier" lang="en">Ice Barrier</string>
+		<string id="Counterspell" lang="en">Counterspell</string>
+		<string id="Remove Lesser Curse" lang="en">Remove Lesser Curse</string>
+		<string id="combustion" lang="en">Combustion</string>		
+		<string id="interrupted" lang="en">Interrupted</string>
+		<string id="fire ward" lang="en">Fire Ward</string>		
+		<string id="frost ward" lang="en">Frost Ward</string>
+		<string id="BeginsToCast" lang="en">begins to cast</string>
+		<string id="petattack()" lang="en">PetAttack()</string>
+		<string id="Demon Skin" lang="en">Demon Skin</string> 
+  		<string id="Demon Armor" lang="en">Demon Armor</string>
+  		<string id="riposte" lang="en">Riposte</string>
+		<string id="HostilePlayerAction" lang="en">(\w+)[\s'].*\byou\b</string>
+		<string id="HostilePlayerDies" lang="en">(.*)\s\bdies\b</string>
+		<string id="TargetPeriodicBuff" lang="en">(.+)\s\bgains\b</string>
+		<string id="CreatureRunsAway" lang="en">attempts to run away in fear</string>
+		<string id="TargetEvadesAttack" lang="en">You\sattack\.\s(.*)\sevades.</string>
+		<string id="TargetEvadesSpell" lang="en">Your\s(.*)\swas\sevaded\sby\s(.*)\.</string>
+		<string id="not enough mana" lang="en">Not enough mana</string>
+		<string id="You die" lang="en">You die</string>
+		<string id="invalid target" lang="en">Invalid target</string>
+	</strings>
+</localization>

@@ -1,0 +1,1764 @@
+---------------------------------------------------------------------------------- 
+--   TinyToon version 1.3  - Blizzhackers open source community bot
+--   based on Blizzbot 1.1 by n1ce 
+--   forceshock gamehacking-interpreter required! 
+--   please download from http://www.forceshock.net/ 
+
+--   World of Warcraft 1.3 4297
+--   Forceshock Version 0.999+     
+                
+--   ; CREDITS 
+-- ; original Bot (blizzbot v1.1) and some math by n1ce 
+-- ; All hacks and most of the math by Outlaw 
+-- ; A lot of bugfix info by paledim 
+-- ; US 1.3.1 modification by n1ce
+-- ; US/EU 1.2.4 (4222) modification by Outlaw/n1ce 
+-- ; optimized combat by deeper (v1.2) 
+-- ; toon object by deeper (v1.2) 
+-- ; optimized engine by deeper (v1.2) 
+-- ; optimized for Forceshock 0.999 nice (v1.3)
+----------------------------------------------------- 
+-- ; Extra fame goes too 
+-------------------------------------------------------------------------                
+-- ; catvir and brainiac2k for reversing WoW since the beginning :) 
+------------------------------------------------------------------------- 
+
+-- ; LICENSE 
+------------------------------------------------------------------------- 
+-- ; GNU GENERAL PUBLIC LICENSE 
+-- ; http://www.gnu.org/copyleft/gpl.html 
+------------------------------------------------------------------------- 
+
+-- ; TODO
+-- ; 1) add pausing
+-- ; 2) check sleeps
+
+--if IsKeyPress("F12") == 1 then
+--   PrintConsoleLine("Press F12 to continue.")
+--   while 1 do
+--      Sleep(5000)
+--      if IsKeyPress("F12") == 1 then
+--         break
+--      end
+--   end
+--end
+
+-- CONSTANTS 
+_APPNAME = "TinyToon" 
+_VERSION = "1.3" 
+_DATE = "20050329"
+_FS_VERSION = 0.999 
+
+-- ; FIGHT_LOGIC 1=WARRIOR, 2=ROGUE
+_FIGHT_LOGIC = 1
+
+-- ; LOOT, 0 - No, 1 - Loot and don't ignore an ambush, 2 - Loot all and ignore an ambush
+_LOOT = 2
+
+-- ; WARRIOR KEYS, CHANGE TO FIT YOUR NEEDS
+_KEY_ATTACK = "1" 
+_KEY_HEROICSTRIKE = "2" 
+_KEY_BATTLESHOUT = "3" 
+_KEY_CHARGE = "4"
+_KEY_REND = "7" 
+
+-- ; ROGUE KEYS, CHANGE TO FIT YOUR NEEDS
+_KEY_ATTACK = "1" 
+_KEY_SS = "2"
+_KEY_EvIS = "3" 
+--_KEY_STEALTH = "7"
+
+-- ; CLEARTARGET MACRO, KEY
+_KEY_CLEARTARGET_MACRO = "5" 
+
+-- ; if oldhp > current hps + _AMBUSH_AMOUNT
+-- ; _AMBUSH_AMOUNT = 15
+
+-- ; RESTING VARIABLES
+_REST_RATE = .67
+_REST_UNTIL_RATE = .97
+
+_USE_BANDAGE = 0
+_KEY_TARGETSELF = "`"
+_KEY_BANDAGE = "7"
+
+_USE_FOOD = 1
+_KEY_FOOD = "8"
+
+---------------------------------------------------------------------------------
+-- ; WoW functions by Outlaw
+---------------------------------------------------------------------------------
+function TargetID(hWnd,high32,low32)
+   Asm.StdCall(hWnd,"0x49B900",high32,low32)
+   Sleep(250)
+end
+
+function GetPlayerPtr(hWnd)
+   register = Asm.FastCall(hWnd,"0x46F4D0","0x10","0x818358",Asm.Ptr("9A1B98"),0)
+   return register.eax
+end
+
+--------------------------------------------------------------------------------- 
+-- ; Player structure 
+--------------------------------------------------------------------------------- 
+-- modified by deeper 20.02.2005 v1.2 
+toon = {} 
+toon.__index = toon 
+function toon.init(hWnd) 
+   local t = {} 
+   setmetatable(t,toon) 
+   PrintConsole("Initializing Toon! [") 
+   i = 1 
+   while 1 do 
+      -- ; Calculations to defeat DMA by Outlaw 
+      PrintConsole(".") 
+      if i <= 25 then 
+         baseptr="12E194"
+      else 
+         baseptr="12C3B4" 
+      end 
+      t.hWnd = hWnd 
+      t.ts_Battleshout   =   0 
+      t.ptr_unit_struct =    HexSub(ReadHex(hWnd,baseptr),"8")      
+      t.ptr_hitpoints =      HexAdd(t.ptr_unit_struct,"1CE8")
+      t.ptr_mana =           HexAdd(t.ptr_unit_struct,"1CEC")
+      t.ptr_maxmana =        HexAdd(t.ptr_mana,"18")
+      t.ptr_maxhp =          HexAdd(t.ptr_hitpoints,"18")
+      t.ptr_current_xp =     HexAdd(t.ptr_unit_struct,"21A8") 
+      t.ptr_max_xp =         HexAdd(t.ptr_unit_struct,"21AC") 
+      t.ptr_rage =           HexAdd(t.ptr_mana,"4") 
+      t.ptr_energy =         HexAdd(t.ptr_rage,"8") 
+      t.ptr_facing =         HexAdd(t.ptr_unit_struct,"93C") 
+      t.ptr_internal_z =     HexSub(t.ptr_facing,"4") 
+      t.ptr_internal_y =     HexSub(t.ptr_internal_z,"4") 
+      t.ptr_internal_x =     HexSub(t.ptr_internal_y,"4") 
+            
+      if ReadDword(hWnd,t.ptr_hitpoints) > 30 and ReadDword(hWnd,t.ptr_hitpoints) < 10000 and ReadFloat(hWnd,t.ptr_facing) > -1 and ReadFloat(hWnd,t.ptr_facing) < 7 then 
+         PrintConsoleLine("] ready") 
+         t:refresh() 
+         break 
+      else 
+         i = i + 1 
+         if i > 50 then 
+            PrintConsoleLine("] Failed.") 
+            PrintConsoleLine("Make sure you have logged your toon in!") 
+            return nil 
+            end 
+      end 
+      Sleep(100) 
+   end    
+   return t 
+end 
+
+function toon:refresh() 
+   self.hp =            ReadDword(self.hWnd,self.ptr_hitpoints) 
+   self.mana =          ReadDword(self.hWnd,self.ptr_mana) 
+   self.maxmana =       ReadDword(self.hWnd,self.ptr_maxmana) 
+   self.maxhp =         ReadDword(self.hWnd,self.ptr_maxhp) 
+   self.energy =        ReadDword(self.hWnd,self.ptr_energy) 
+   self.rage =          ReadDword(self.hWnd,self.ptr_rage) 
+   self.TargetID =      ReadDword(self.hWnd,"9ABFB8")
+   self.hoverID =       ReadDword(self.hWnd,self.ptr_hover_id) 
+   self.playerID =      ReadDword(self.hWnd,"9A1B98")
+   self.xp =            ReadDword(self.hWnd,self.ptr_current_xp) 
+   self.maxxp =         ReadDword(self.hWnd,self.ptr_max_xp) 
+   self.x =             ReadFloat(self.hWnd,self.ptr_internal_x) 
+   self.y =             ReadFloat(self.hWnd,self.ptr_internal_y) 
+   self.z =             ReadFloat(self.hWnd,self.ptr_internal_z) 
+   self.facing =        ReadFloat(self.hWnd,self.ptr_facing) 
+   self.ptrAttacker =   nil 
+   self.hp_percent =    100 / self.maxhp * self.hp 
+   self.mana_percent =   100 / self.maxmana * self.mana 
+end 
+
+function toon:GetAttackerPtr() 
+     PrintConsole("looking up attacker ...") 
+     ptr = nil 
+     -- wait to make sure the server sends a Target 
+     count = 100 
+     while self.TargetID == 0 and count > 0 do 
+        Sleep(1) 
+        self.TargetID = ReadDword(hWnd,"9ABFB8")
+        count = count - 1 
+     end 
+   if self.TargetID ~= 0 then 
+      ptr = NpcIDToPtr(hWnd,self.TargetID) 
+      Npc = GetNpcData(hWnd,ptr) 
+      if Npc.hp > 0 and Npc.hp <= 100 then 
+         self.ptrAttacker = ptr 
+      end 
+     end 
+     PrintConsoleLine(" done.") 
+   return ptr 
+end 
+
+function toon:GetDistance(x,y) 
+   return GetDistance(self.x,self.y,x,y) 
+end 
+
+function toon:setCorpseLoc() 
+   self.corpsex = self.x 
+   self.corpsey = self.y 
+end 
+
+function toon:GetCorpseLoc() 
+   return self.corpsex,self.corpsey 
+end 
+
+function toon:GetLoc() 
+   return self.x,self.y 
+end    
+
+--------------------------------------------------------------------------------- 
+-- ; Npc handling 
+--------------------------------------------------------------------------------- 
+function ResetNpcBuffer(hWnd) WriteDword(hWnd,hook.clear,1) Sleep(100) end
+function CreateNpcBuffer(hWnd,loops) WriteDword(hWnd,hook.loops,loops) end
+function GetNpcBufferPtr() return hook.npc_array end 
+function GetLocOfNextNpcPtr(buffer,size) return HexAdd(buffer,"4") end 
+function IsNpcBufferReady(hWnd) if ReadDword(hWnd,hook.loops) == 0 then return 1 else return 0 end end
+function GetNpcCount(hWnd) return ReadDword(hWnd,hook.npc_count) end 
+function WaitForNpcBuffer(hWnd) while IsNpcBufferReady(hWnd) ~= 1 do Sleep(10) end end 
+function NpcIDToPtr(hWnd,sid) 
+   CreateNpcBuffer(hWnd, 1000) 
+   WaitForNpcBuffer(hWnd) 
+   iNpcs = GetNpcCount(hWnd) 
+   if iNpcs > 0 then 
+      p = GetNpcBufferPtr()    
+      ptr = ReadHex(hWnd,p) 
+      while iNpcs  ~= 0 do 
+         Npc = GetNpcData(hWnd,ptr) 
+         if Npc.id == sid then 
+            return ptr 
+         end 
+         p = GetLocOfNextNpcPtr(p) 
+         ptr = ReadHex(hWnd,p) 
+         iNpcs  = iNpcs  - 1 
+      end 
+   end 
+   return nil 
+end 
+
+--------------------------------------------------------------------------------- 
+-- ; Npc structure 
+--------------------------------------------------------------------------------- 
+function GetNpcData(hWnd,ptr) 
+  
+   Npc = { 
+      ptr = ptr, 
+      id = ReadDword(hWnd,HexAdd( ptr , "4C0")), 
+      id2 = ReadDword(hWnd,HexAdd( ptr , "4C4")),
+      hp = ReadDword(hWnd,HexAdd( ptr , "354")), 
+      level = ReadDword(hWnd,HexAdd( ptr , "548")), 
+      faction = ReadDword(hWnd,HexAdd( ptr , "54C")), 
+      x = ReadFloat(hWnd, HexAdd( ptr , "10")), 
+      y = ReadFloat(hWnd, HexAdd( ptr , "14")), 
+      z = ReadFloat(hWnd, HexAdd( ptr , "18")), 
+      facing = ReadFloat(hWnd, ptr ,"1C"), 
+   } 
+   return Npc 
+end    
+
+--------------------------------------------------------------------------------- 
+-- ; Hook 
+-- ; 12.2.2005 Redone by Outlaw 
+-- ; 23.2.2005 Redone by Outlaw 
+-- ; 4.3.2005 Redone by Outlaw
+--------------------------------------------------------------------------------- 
+
+function Sense_Hook(hWnd,hook)
+   
+   h = hook
+   ret = HexAdd(h,"6")
+   
+   -- ; .DATA
+   hook = {
+     clear = Asm.AllocateMemory(hWnd,4),
+     loops = Asm.AllocateMemory(hWnd,4),
+     npc_count = Asm.AllocateMemory(hWnd,4),
+     npc_array = Asm.AllocateMemory(hWnd,1024)
+   }
+
+   -- ; .CODE
+   asm = #ASM_START
+   
+      ; START
+      @sense_hack:
+         push ecx
+         push eax
+         cmp dword *(hook.clear),1
+         je @empty_data
+         cmp dword *(hook.loops),0
+         je @end
+         dec dword *(hook.loops)
+         add ecx,354h
+         cmp dword [ecx],64h
+         jg @end
+         cmp dword [ecx],1h
+         jl @end
+         add ecx,1F4h
+         cmp dword [ecx],1h
+         jl @end
+         cmp dword [ecx],50h
+         jg @end
+         sub ecx,548h
+         mov eax, &(hook.npc_array)
+      
+      @check_if_new:
+         cmp dword [eax],0
+         je @add_npc
+         cmp dword [eax],ecx
+         je @end
+         add eax,4h
+         jmp @check_if_new
+         
+      @add_npc:
+         mov dword [eax],ecx
+         inc dword *(hook.npc_count)
+         jmp @end
+         
+      @empty_data:
+         mov eax, &(hook.npc_array)
+         mov dword *(hook.clear),0
+         mov dword *(hook.npc_count),0      
+         mov dword *(hook.loops),0         
+      
+      @empty_loop:
+         cmp dword [eax],0
+         je @end
+         mov dword [eax],0
+         add eax,4h
+         jmp @empty_loop
+         
+      @end:
+         pop eax
+         pop ecx
+         sub esp,40h
+         mov eax,dword [ecx+38h]
+         jmp dword &(ret)
+      ; end
+      
+   #ASM_END
+   
+   code = Asm.AllocateMemory(hWnd,Asm.OpCodeSize(asm))
+   Asm.Write(hWnd,code,asm)
+   -- ; .HOOK
+   Asm.WriteJmp(hWnd,h,code,1)
+   
+   return hook
+end
+ 
+--------------------------------------------------------------------------------- 
+-- ; Helper functions 
+--------------------------------------------------------------------------------- 
+function DebugMessage(message,line,debug) 
+   if debug == 1 then 
+      PrintConsole(message) 
+      if line == 1 then PrintConsoleLine("") end 
+   end 
+end 
+
+function WaitForTargetID(hWnd,id,time) 
+   PrintConsole("[+ Waiting for Target ID: "..IntToStr(id).." ...") 
+   tn:refresh() 
+   ohp = tn.hp 
+   while tn.TargetID ~= id do 
+      if time == 1 then PrintConsoleLine(" time out]") return 0 end 
+      Sleep(10) 
+      time = time - 1 
+      tn:refresh() 
+      if tn.hp < ohp then 
+         PrintConsoleLine(" skipping]") 
+         return 0 
+      end 
+      ohp = tn.hp    
+   end 
+   PrintConsoleLine(" ready]") 
+   return 1 
+end 
+
+function WaitForTargetIsNotNull(hWnd,time) 
+   PrintConsole("[+ Waiting until there is a Target ...") 
+
+   tn:refresh() 
+
+   ohp = tn.hp 
+   while tn.TargetID == 0 do 
+      if time == 1 then PrintConsoleLine(" time out]") return 0 end 
+      Sleep(10) 
+      time = time - 1 
+      tn:refresh()        
+      if tn.hp < ohp then 
+         PrintConsoleLine(" skipping]") 
+         return 0 
+      end 
+      ohp = tn.hp 
+   end 
+   PrintConsoleLine(" ready]") 
+   return 1 
+end 
+
+function GetNpc(hWnd,cat,corpse,wpx,wpy,minl,maxl,rad,debug) 
+   -- optimized by deeper v1.2 
+   -- looksup a valid Npc, returns a Npc 
+   -- cat: 0 return lowest range, ... (more to come) 
+   -- corpse: 1 return corpses found, 0 dont 
+   data = {} 
+   i = 0 
+   PrintConsoleLine("SCANNING FOR MOBS!") 
+    
+   CreateNpcBuffer(hWnd,2000) 
+   WaitForNpcBuffer(hWnd) 
+   iNpcs = GetNpcCount(hWnd) 
+    
+   if iNpcs > 0 then 
+      
+      p = GetNpcBufferPtr() 
+      ptr = ReadHex(hWnd,p) 
+      tn:refresh() 
+        
+      while iNpcs  ~= 0 do 
+          
+         valid = 1 
+          
+         Npc = GetNpcData(hWnd,ptr) 
+         DebugMessage("   scanning ... Npc HP% : "..IntToStr(Npc.hp).." range: "..IntToStr(GetDistance(tn.x,tn.y,Npc.x,Npc.y)).." level: "..IntToStr(Npc.level).." ID: "..IntToStr(Npc.id),1,debug) 
+         -- is the Npc blacklisted? 
+         n = blacklist_count 
+         while n > 0 and valid == 1 do 
+            if Blacklist[n] == Npc.id then 
+               DebugMessage("      ... is blacklisted!",1,debug) 
+               valid = 0 
+            end 
+            n = n - 1 
+         end 
+            
+           -- is the Npc in the hunting Radius of the current Waypoint? 
+           if GetDistance(wpx,wpy,Npc.x,Npc.y) > rad and valid == 1 then 
+              DebugMessage("      ... is out of hunting radius!",1,debug) 
+              valid = 0 
+           end 
+            
+           -- is the Npc dead? 
+         if Npc.hp == 0 and valid == 1 then 
+            if corpse == 1 then 
+               DebugMessage("      ... corpse found! ok.",1,debug) 
+               return ptr 
+            else 
+               DebugMessage("      ... is dead!",1,debug) 
+               valid = 0 
+            end 
+         end 
+          
+         -- does the Npc match the level requirements? 
+         if (Npc.level < minl or Npc.level > maxl) and valid == 1 then 
+            DebugMessage("      ... does not match level requirement!",1,debug) 
+            valid = 0 
+         end 
+          
+         -- is the Npc at full health? 
+         if Npc.hp ~= 100 and valid == 1 then 
+            DebugMessage("      ... is already fighting!",1,debug) 
+            valid = 0 
+         end 
+          
+         if Npc.id <= 0 or Npc.id >= 297000000 then 
+            DebugMessage("      ... id not valid!",1,debug) 
+            valid = 0 
+         end 
+          
+         -- if everything was ok, add the Npc to our list for category checks ... 
+         if valid == 1 then 
+            DebugMessage("      ... adding to valid list!",1,debug) 
+            data[i] = ptr 
+            i = i + 1 
+         end 
+          
+         p = GetLocOfNextNpcPtr(p) 
+         ptr = ReadHex(hWnd,p) 
+         iNpcs  = iNpcs  - 1 
+      end 
+      
+      if i > 0 then 
+         rNpc = GetNpcData(hWnd,data[i]) 
+         -- category 0 (closest range) 
+         if cat == 0 then 
+            PrintConsole("   Looking up nearest Npc ...") 
+            while i > 0 do 
+               i = i - 1 
+               Npc = GetNpcData(hWnd,data[i]) 
+               if tn:GetDistance(Npc.x,Npc.y) < tn:GetDistance(rNpc.x,rNpc.y) then 
+                  rNpc = Npc 
+               end 
+            end 
+         end 
+         if cat == 1 then 
+            -- other categories 
+         end 
+          
+         ResetNpcBuffer(hWnd) 
+         PrintConsoleLine(" found ID: "..IntToStr(rNpc.id)) 
+         return rNpc 
+      else 
+         ResetNpcBuffer(hWnd) 
+         return nil 
+      end      
+   else 
+      ResetNpcBuffer(hWnd) 
+      return nil 
+   end 
+    
+   ResetNpcBuffer(hWnd) 
+   return nil 
+end 
+
+function XYtoFace(hWnd,x,y) 
+
+   tn:refresh() 
+    
+   RealX = tn.x - x 
+   RealY = tn.y - y 
+   if RealX < 0 then RealX = RealX  * -1 end 
+   if RealY < 0 then RealY = RealY  * -1 end 
+    
+   if x > tn.x and y > tn.y then 
+      g = math.deg ( math.atan( RealY / RealX ) ) 
+   end 
+   if x > tn.x and y < tn.y then 
+      g = ( ( math.deg ( math.atan( RealY /  RealX  ) ) * - 1 ) + 90 ) + 270 
+   end 
+   if x < tn.x and y < tn.y then 
+      g = math.deg ( math.atan( RealY / RealX ) ) + 180 
+   end 
+   if x < tn.x and y > tn.y then 
+      g = ( ( math.deg ( math.atan( RealY  / ( RealX ) ) ) * - 1 ) + 90 ) + 90 
+   end 
+    
+   if g == nil then return 0 end 
+    
+   return ( ( 2 * math.pi ) / 360 )  * g 
+end 
+
+function SpinPlayer(hWnd,Target) 
+      tn:refresh() 
+      -- ; 9.2.2005  - New improved spinning code by Outlaw 
+      -- ; 13.2.2005 - Improved by n1ce 
+
+      -- L 
+      if tn.facing > Target then 
+         L = ( ( 2 * math.pi ) - tn.facing ) + Target 
+      else 
+         L = Target - tn.facing 
+      end 
+      
+      -- R 
+      if tn.facing > Target then 
+         R = tn.facing - Target 
+      else 
+         R = tn.facing + ( ( 2 * math.pi ) - Target ) 
+      end 
+      if R < L then 
+         if R > 2 then 
+            PressKey("RIGHT",200) 
+         else 
+            PressKey("RIGHT",100) 
+         end 
+      else 
+         if L > 2 then 
+            PressKey("LEFT",200) 
+         else 
+            PressKey("LEFT",100) 
+         end    
+      end 
+end 
+
+function FaceXY(hWnd,x,y,acc) 
+   while 1 do 
+      Target = XYtoFace(hWnd,x,y) 
+--      PrintConsoleLine("facing: "..tn.facing.." Target: "..Target) 
+      if ( tn.facing - acc/10) < Target and ( tn.facing + acc/10) > Target then 
+         return 1 
+      else 
+         SpinPlayer(hWnd,Target) 
+      end 
+   end 
+end 
+
+function GetDistance(x1,y1,x2,y2) 
+   -- returns distance of x1,y1 to x2,y2 
+   return (math.sqrt((x1 - x2)^2 + (y1 - y2)^2)) 
+end 
+
+function MoveToXY(hWnd,x,y,close) 
+   -- ; Optimized movement code 
+   -- ; improved by deeper 2005.02.20 
+
+   if sitting == 1 then 
+      sitting = 0 
+      SendKeys(hWnd,"x") 
+   end 
+    
+   PrintConsoleLine("MOVING TO LOCATION x: "..FloatToStr(x).." y: "..FloatToStr(y).." dist: "..IntToStr(GetDistance(x,y,tn.x,tn.y))) 
+   t = GetTimeStamp() 
+   FaceXY(hWnd,x,y,3) 
+   s = GetTimeStamp() 
+   tn:refresh() 
+   oldx = tn.x 
+   oldy = tn.y 
+   oldhp = tn.hp 
+
+   HoldKey("UP") 
+   while 1 do 
+
+      Sleep(100) 
+      tn:refresh() 
+
+     --PrintConsoleLine("      MoveToXY-tn.hp: "..IntToStr(tn.hp))
+     --PrintConsoleLine("      MoveToXY-oldhp: "..IntToStr(oldhp))
+
+      --DGB
+      --if oldhp > (tn.hp + _AMBUSH_AMOUNT) then         
+      if oldhp > tn.hp and tn.TargetID > 0 then
+         PrintConsoleLine("   AMBUSH!") 
+         return 0
+      end 
+
+       --DGB
+       oldhp = tn.hp 
+    
+      if tn:GetDistance(x,y) <= close then 
+         PrintConsoleLine("   arrived at destinaton.") 
+           ReleaseKey("UP") 
+         return 1 
+      else 
+         if SinceTimeStamp(s) > Randomize(1354,2142) then 
+            PrintConsoleLine("   distance to go: "..IntToStr(GetDistance(tn.x,tn.y,x,y)-close)) 
+            
+            --evade code 
+            if (GetDistance(tn.x,tn.y,oldx,oldy) < 3) then 
+               ReleaseKey("UP") 
+               PrintConsoleLine("   Toon stuck! Trying to evade.") 
+               FaceXY(hWnd,x*-1,y*-1,3) 
+               PressKey("UP",1000) 
+               FaceXY(hWnd,x,y*-1,3) 
+               HoldKey("UP") 
+            end 
+            FaceXY(hWnd,x,y,3) 
+            s = GetTimeStamp() 
+            oldx = tn.x 
+            oldy = tn.y 
+         end 
+      end 
+    
+      if SinceTimeStamp(t) > 25000 then 
+         PrintConsoleLine("   Can not reach location. Giving up.") 
+         ReleaseKey("UP") 
+         return 0 
+      end 
+   end 
+end 
+
+function MoveToNpc(hWnd,ptr,unstoppable,close,debug) 
+   -- ; Optimized movement code 
+   -- ; improved by deeper 2005.02.20 
+    
+   if sitting == 1 then 
+      sitting = 0 
+      SendKeys(hWnd,"x") 
+   end 
+   Npc = GetNpcData(hWnd,ptr) 
+   tn:refresh() 
+   oldx = tn.x 
+   oldy = tn.y 
+   oldhp = tn.hp 
+   DebugMessage("MOVE TO Npc id: "..IntToStr(Npc.id).." dist: "..IntToStr(GetDistance(tn.x,tn.y,Npc.x,Npc.y)),1,debug) 
+   FaceXY(hWnd,Npc.x,Npc.y,3) 
+   if GetDistance(tn.x,tn.y,Npc.x,Npc.y) < close then return 1 end 
+   t = GetTimeStamp() 
+   s = GetTimeStamp() 
+   HoldKey("UP") 
+    
+   while 1 do 
+      Sleep(100) 
+      Npc = GetNpcData(hWnd,ptr) 
+      tn:refresh() 
+
+     --PrintConsoleLine("      MoveToNpc-tn.hp: "..IntToStr(tn.hp))
+     --PrintConsoleLine("      MoveToNpc-oldhp: "..IntToStr(oldhp))
+
+      --DGB
+      --if oldhp > (tn.hp + _AMBUSH_AMOUNT) and unstoppable == 0 then 
+      if oldhp > tn.hp and unstoppable == 0 and tn.TargetID > 0 then
+         PrintConsoleLine("   AMBUSH!") 
+         return 0 
+      end 
+       --DGB
+       oldhp = tn.hp 
+        
+      if GetDistance(tn.x,tn.y,Npc.x,Npc.y) < close then 
+           DebugMessage("   arrived at Npc.",1,debug) 
+           ReleaseKey("UP") 
+         return 1 
+      else 
+         if SinceTimeStamp(s) > Randomize(854,1228) then 
+            DebugMessage("   distance to go: "..IntToStr(GetDistance(tn.x,tn.y,Npc.x,Npc.y)-close),1,debug) 
+            --evade code 
+            if (GetDistance(tn.x,tn.y,oldx,oldy) < 3) then 
+               ReleaseKey("UP") 
+               DebugMessage("   Toon stuck! Trying to evade.",1,debug) 
+               FaceXY(hWnd,Npc.x*-1,Npc.y*-1,3) 
+               PressKey("UP",1000) 
+               FaceXY(hWnd,Npc.x,Npc.y*-1,3) 
+               HoldKey("UP") 
+            end 
+            if (Npc.hp < 100 and Npc.hp ~= 0) and unstoppable == 0 then 
+               ReleaseKey("UP") 
+               DebugMessage("   Npc is under attack, stopping!",1,debug) 
+               return 0 
+            end 
+            if unstoppable == 1 then ReleaseKey("UP") end 
+            FaceXY(hWnd,Npc.x,Npc.y,3) 
+            if unstoppable == 1 then HoldKey("UP") end 
+            s = GetTimeStamp() 
+            oldx = tn.x 
+            oldy = tn.y 
+         end 
+      end 
+      
+      if SinceTimeStamp(t) > 25000 then 
+         DebugMessage("   Can not reach Npc. Giving up.",1,debug) 
+         ReleaseKey("UP") 
+         return 0 
+      end 
+   end 
+   ReleaseKey("UP") 
+   return 0 
+end 
+
+--------------------------------------------------------------------------------- 
+-- ; The control window 
+--------------------------------------------------------------------------------- 
+function window_open()
+  gui = OpenGui(_APPNAME,300,400)
+  Sleep(100)
+  -- ; Loot settings
+  AddFrame(gui,"Loot settings",0,0,300,60)
+  lb_loot = AddLabel(gui,"Size of the looting area:",7,15,290,15)
+  AddLabel(gui,"<< small",7,33,40,20)
+  sl_acu = AddSlider(gui,46,30,165,25,20,80)
+  AddLabel(gui,"big >>",210,33,50,20)
+  SetSliderStatus(sl_acu,60)
+  cb_skin = AddCheckBox(gui,"skin",245,33,49,15)
+
+  -- ; Area hunting settings
+  AddFrame(gui,"Area hunting settings",0,62,300,150)
+
+  lb_area = AddLabel(gui,"F6 add Corpserun WP. F7 add Hunting WP.",7,78,250,15)
+
+  list_cr_x = AddList(gui,7,94,143,50)
+  list_cr_y = AddList(gui,150,94,143,50)
+
+  list_x = AddList(gui,7,150,143,50)
+  list_y = AddList(gui,150,150,143,50)
+
+  lb_radius = AddLabel(gui,"Hunting radius :",7,223,80,15)
+  eb_radius = AddEditBox(gui,"64",84,220,30,20)
+
+  lb_level = AddLabel(gui,"Level range :",7,177+70,120,15)
+  eb_level_min = AddEditBox(gui,"1",84,174+70,30,20)
+  lb_leavel2 = AddLabel(gui," - ",125,177+70,20,15)
+  eb_level_max = AddEditBox(gui,"60",147,174+70,30,20)
+
+  -- ; Emergency settings
+  AddFrame(gui,"In case of an emergency settings",0,201+70,300,67)
+  lb_eg_key = AddLabel(gui,"Press key",7,219+70,60,15)
+  eb_eg_key = AddEditBox(gui,"9",60,217+70,15,20)
+  lb_eg_hp = AddLabel(gui,"if hp are under",81,219+70,80,15)
+  eb_eg_hp = AddEditBox(gui,"40",158,217+70,26,20)
+  lb_percent = AddLabel(gui,"percent.",190,219+70,80,15)
+
+  lb_eg_key2 = AddLabel(gui,"Press key",7,219+70+24,60,15)
+  eb_eg_key2 = AddEditBox(gui,"9",60,217+70+24,15,20)
+  lb_eg_hp2 = AddLabel(gui,"if hp are under",81,219+70+24,80,15)
+  eb_eg_hp2 = AddEditBox(gui,"40",158,217+70+24,26,20)
+  lb_percent2 = AddLabel(gui,"percent.",190,219+70+24,80,15)
+
+  -- ; Buttons
+  save = AddButton(gui,"Save settings",2,274+70,75,25)
+  load = AddButton(gui,"Load settings",77,274+70,75,25)
+  eb_eg_profile = AddEditBox(gui,"Default",158,274+70,135,20)
+  
+  lb_info = AddLabel(gui,"      Press F8 to start the bot.",2,274+70+24+10,150,15)
+  SetItemColor(lb_info,RGB(0,255,0),0)
+
+  ExitOnGuiClose(gui)
+end 
+
+--------------------------------------------------------------------------------- 
+-- ; WoW functions 
+--------------------------------------------------------------------------------- 
+function ClearTarget() 
+   --SendKeys(hWnd,"{ENTER}") 
+   --Sleep(10) 
+   --SendKeys(hWnd,"/script ClearTarget();") 
+   --Sleep(10) 
+   --SendKeys(hWnd,"{ENTER}") 
+
+   Sleep(10) 
+   SendKeys(hWnd,_KEY_CLEARTARGET_MACRO) 
+end 
+
+--------------------------------------------------------------------------------- 
+-- ; The loot function. 
+-- ; 16.2.2005 Improved by nice 
+--------------------------------------------------------------------------------- 
+
+function loot(hWnd,id) 
+   -- ; improved by deeper 2005.02.20 
+   
+   PrintConsoleLine("LOOTING!") 
+   PrintConsoleLine("   Searching for corpse ID: "..IntToStr(id)) 
+   
+   lx1,ly1,lx2,ly2 = GetWindowRect(hWnd) 
+   slider = 100 - GetSliderStatus(sl_acu) 
+   lx1 = lx1 + ( ( lx2 - lx1 ) /100 * slider ) 
+   ly1 = ly1 + ( ( ly2 - ly1 ) /100 * slider ) 
+   lx2 = lx2 - ( ( lx2 - lx1 ) /100 * slider ) 
+   ly2 = ly2 - ( ( ly2 - ly1 ) /100 * slider ) 
+   
+   lootok = 0 
+   
+   tn:refresh() 
+   
+   ohp = tn.hp 
+   
+   sy = ly1 
+   while lx1 < lx2 do 
+      while ly1 < ly2 do 
+         ly1 = ly1 + 25 
+         LeftClick(lx1,ly1,1) 
+   
+         tn:refresh() 
+         
+         --if ohp > (tn.hp + _AMBUSH_AMOUNT) then 
+         --   PrintConsoleLine("   AMBUSH!") 
+         --   return 0 
+         --end 
+         
+         ohp = tn.hp 
+         
+         if tn.TargetID == id then 
+            HoldKey("SHIFT") 
+            RightClick(lx1,ly1,1) 
+            if WaitForTargetID(hWnd,id,300) == 0 then 
+               ReleaseKey("SHIFT") 
+               PrintConsoleLine("      Looting timeout, skipping.") 
+               return 0 
+            end 
+            
+            tn:refresh() 
+            
+            --if oldhp > (tn.hp + _AMBUSH_AMOUNT) then 
+            --   ReleaseKey("SHIFT") 
+            --   PrintConsoleLine("   AMBUSH!") 
+            --   return 0 
+            --end 
+            
+            ohp = tn.hp 
+            
+            PrintConsoleLine("      Npc corpse found ... looting.") 
+            if WaitForTargetID(hWnd,0,300) == 0 then 
+               ReleaseKey("SHIFT") 
+               PrintConsoleLine("      Can't find corpse, skipping.") 
+               return 0 
+            end 
+            
+            tn:refresh() 
+            
+            --if oldhp > (tn.hp + _AMBUSH_AMOUNT) then 
+            --   ReleaseKey("SHIFT") 
+            --   PrintConsoleLine("   AMBUSH!") 
+            --   return 0 
+            --end 
+            
+            if GetCheckBoxState(cb_skin) == 1 then 
+               PrintConsoleLine("      Npc corpse found ... skinning.") 
+               Sleep(1000) 
+               RightClick(lx1,ly1,1) 
+               if WaitForTargetID(hWnd,0,300) == 0 then 
+                  ReleaseKey("SHIFT") 
+                  PrintConsoleLine("      Skinning timeout, skipping.") 
+                  ClearTarget() 
+                  return 0 
+               end 
+            end
+             
+            PrintConsoleLine("      Npc corpse plundered.") 
+            ReleaseKey("SHIFT") 
+            PrintConsoleLine("   done.") 
+            ClearTarget() 
+            return 1 
+         end 
+      end 
+      lx1 = lx1 + 25 
+      ly1 = sy 
+   end 
+   tn:refresh() 
+   if tn.TargetID ~= 0 then ClearTarget() end 
+   PrintConsoleLine("   failed.") 
+return 0 
+end 
+
+--------------------------------------------------------------------------------- 
+-- ; The resting is handled here. 
+-- ; Edit to fit your needs 
+--------------------------------------------------------------------------------- 
+function rest(rate) 
+   -- ; improved by deeper 2005.02.20 
+   tn:refresh() 
+   sitting = 0 
+   oldhp = tn.hp 
+    
+   PrintConsoleLine("RESTING!") 
+    
+   -- player died 
+   if tn.hp == 0 then 
+      PrintConsoleLine("   Player is dead!") 
+      return 0 
+   end 
+    
+   if tn.hp < tn.maxhp*rate then 
+      PrintConsoleLine("   Resting to recover "..IntToStr(tn.maxhp*_REST_UNTIL_RATE - tn.hp).." hit point(s).") 
+   else 
+      PrintConsoleLine("   Don't need to rest.")      
+      return 0 
+   end 
+   --while tn.hp < tn.maxhp*rate do 
+   while tn.hp < tn.maxhp*_REST_UNTIL_RATE do
+      tn:refresh() 
+    
+    --DGB------------------------------
+
+      if _USE_BANDAGE == 1 then
+         Sleep(100)
+
+         PrintConsoleLine("      USING A BANDAGE")
+
+         SendKeys(hWnd,_KEY_TARGETSELF)
+         Sleep(100)
+
+         SendKeys(hWnd,_KEY_BANDAGE)
+         Sleep(8000)
+      end
+
+     if _USE_FOOD == 1 then
+        Sleep(500)
+
+        if food_msg == 0 then
+             PrintConsoleLine("      EATING SOME FOOD LIKA WHOAH")
+             food_msg = 1
+        end
+        if sitting == 0 then
+           Sleep(100)
+           SendKeys(hWnd,_KEY_FOOD)
+           sitting = 1
+        end
+     end
+
+     --PrintConsoleLine("      rest-tn.hp: "..IntToStr(tn.hp))
+     --PrintConsoleLine("      rest-oldhp: "..IntToStr(oldhp))
+
+     -----------------------------------
+      
+      if tn.hp == tn.maxhp then break end
+
+      --if oldhp > (tn.hp + _AMBUSH_AMOUNT) then 
+      if oldhp > tn.hp and tn.TargetID > 0 then
+         PrintConsoleLine("   AMBUSH!") 
+         return 0 
+      end 
+
+      oldhp = tn.hp 
+      Sleep(1) 
+   end 
+    
+   if sitting == 1 then 
+      sitting = 0 
+      SendKeys(hWnd,"x") 
+   end 
+   PrintConsoleLine("   done.")    
+   return 1    
+end 
+
+--------------------------------------------------------------------------------- 
+-- ; The actual fight happens here 
+-- ; Edit to fit your needs 
+--------------------------------------------------------------------------------- 
+function fight_warrior(hWnd,ptr) 
+    
+   ReleaseKey("UP") 
+   ReleaseKey("SHIFT") 
+   PrintConsoleLine("FIGHT!") 
+   tick = 0 
+   count = 0 
+   Npc = GetNpcData(hWnd,ptr)    
+   tn:refresh() 
+   oldhp = 0 
+   oldNpchp = 0 
+   oldNpcid = Npc.id 
+
+   if tn.TargetID ~= 0 then 
+      PrintConsoleLine("   clearing Target ...") 
+      ClearTarget() 
+   end 
+   if WaitForTargetID(hWnd,0,100) == 0 then return 0 end 
+   
+   PrintConsoleLine("Targeting NPC: "..IntToStr(Npc.id)) 
+   
+   if tn.TargetID == 0 then 
+      i = 0 
+      while i < 3 and tn.TargetID == 0 do 
+         PrintConsoleLine("   waiting for Target ...") 
+         if i > 0 then 
+             if GetDistance(tn.x,tn.y,Npc.x,Npc.y) < 30 then 
+                MoveToNpc(hWnd,ptr,1,4,0) 
+             else 
+                PrintConsoleLine("      Npc no longer in range.") 
+                return 0 
+             end 
+          end 
+         -- ; TargetID(hWnd,Npc.id,Npc.id2)
+         SendKeys(hWnd,_KEY_ATTACK) 
+         if WaitForTargetIsNotNull(hWnd,100) == 1 then break end 
+          tn:refresh() 
+          Npc = GetNpcData(hWnd,ptr) 
+          i = i + 1 
+      end 
+      if tn.TargetID == 0 then 
+         Npc = GetNpcData(hWnd,ptr) 
+         Blacklist[blacklist_count] = Npc.id 
+         PrintConsoleLine("   blacklisting Npc id: "..Blacklist[blacklist_count]) 
+         blacklist_count = blacklist_count + 1 
+           tn:refresh() 
+           if tn.TargetID ~= 0 then ClearTarget() end 
+         return 0 
+      end 
+   else 
+      return 0 
+   end 
+    
+   tn:refresh() 
+   if (tn.TargetID) ~= Npc.id then 
+      ptr = tn:GetAttackerPtr() 
+   end 
+    
+   PrintConsoleLine("   fighting ...") 
+   PrintConsoleLine("   Npc id: "..Npc.id..", level: "..Npc.level) 
+
+    charge = 0 
+    rend = 0 
+   while 1 do 
+
+      tn:refresh() 
+      Npc = GetNpcData(hWnd,ptr) 
+      
+      if tn.hp == 0 then 
+         PrintConsoleLine("      your toon died while fighting!") 
+         break 
+      end 
+      
+      if tn:GetDistance(Npc.x,Npc.y) < 2 then PressKey("DOWN",200) end 
+        
+      special = 0 
+      
+      if oldhp ~= tn.hp or oldNpchp ~= Npc.hp and oldNpcid == Npc.id then 
+         PrintConsoleLine("      PLAYER HP%: "..IntToStr(tn.hp_percent).." Target HP%: "..IntToStr(Npc.hp)) 
+      end 
+      
+
+      --DGB------------------------------     
+
+      -- charge 
+      if charge == 0 and tn:GetDistance(Npc.x,Npc.y) > 10 then 
+         PrintConsoleLine("      performing CHARGE!") 
+         SendKeys(hWnd,_KEY_CHARGE) 
+         charge = 1 
+        end 
+          
+        -- rend 
+        if rend == 0 and tn.rage >= 100 then 
+           PrintConsoleLine("      performing REND!") 
+         SendKeys(hWnd,_KEY_REND) 
+         rend = 1 
+         special = 1 
+        end 
+          
+        -- heroic strike 
+      if tn.rage >= 150 and SinceTimeStamp(tick) > 1500 and special == 0 then 
+         if tn.rage >= 400 then 
+            PrintConsoleLine("      performing HEROIC STRIKE!") 
+            SendKeys(hWnd,_KEY_HEROICSTRIKE) 
+            special = 1 
+         else 
+            if tn.hp_percent - Npc.hp < 30 then 
+               if tn.hp_percent < 50 then 
+                  PrintConsoleLine("      performing HEROIC STRIKE!") 
+                  SendKeys(hWnd,_KEY_HEROICSTRIKE) 
+                  special = 1 
+               else 
+                  if Npc.hp > 30 then 
+                     PrintConsoleLine("      performing HEROIC STRIKE!") 
+                     SendKeys(hWnd,_KEY_HEROICSTRIKE) 
+                     special = 1 
+                  end 
+               end 
+            end 
+         end 
+         tick = GetTimeStamp() 
+      end 
+
+      -----------------------------------
+      
+      if Npc.hp == 0 or Npc.hp > 100 then break end 
+      if tn.hp_percent <= em_hp then SendKeys(hWnd,em_key) end 
+      if tn.hp_percent <= em_hp2 then SendKeys(hWnd,em_key2) end
+
+      if MoveToNpc(hWnd,ptr,1,4,0) == 0 then return 0 end 
+      FaceXY(hWnd,Npc.x,Npc.y,3) 
+  
+      if Npc.hp == 100 then 
+         if count > 10 and tn.hp == tn.maxhp then 
+            PrintConsoleLine("      Can not damage this Target. I try to Get a new one!") 
+            ClearTarget() 
+            return 0 
+         end    
+      end 
+      oldhp = tn.hp 
+      oldNpchp = Npc.hp 
+      count = count + 1 
+      Sleep(Randomize(550,950)) 
+   end 
+    
+   PrintConsoleLine("   done.") 
+    
+   -- battle shout 
+   if tn.rage >= 200 and SinceTimeStamp(tn.ts_battleshout) > 70000 then 
+      PrintConsoleLine("   performing BATTLE SHOUT!") 
+      SendKeys(hWnd,_KEY_BATTLESHOUT) 
+      tn.ts_battleshout = GetTimeStamp() 
+   end 
+    
+   if tn.hp == 0 then return 0 end 
+   mobs_killed = mobs_killed + 1 
+    
+   SetWindowTitle(hWnd,_APPNAME.." | NpcS KILLED:["..IntToStr(mobs_killed).."]") 
+    
+   tn:refresh() 
+   if tn.TargetID ~= 0 then ClearTarget() end 
+   return oldNpcid 
+end 
+
+--------------------------------------------------------------------------------- 
+-- ; The actual fight happens here 
+-- ; Edit to fit your needs 
+--------------------------------------------------------------------------------- 
+function fight_rogue(hWnd,ptr) 
+    
+   ReleaseKey("UP") 
+   ReleaseKey("SHIFT") 
+   PrintConsoleLine("FIGHT!") 
+   tick = 0 
+   count = 0 
+   Npc = GetNpcData(hWnd,ptr)    
+   tn:refresh() 
+   oldhp = 0 
+   oldNpchp = 0 
+   oldNpcid = Npc.id 
+
+   if tn.TargetID ~= 0 then 
+      PrintConsoleLine("   clearing Target ...") 
+      ClearTarget() 
+   end 
+   if WaitForTargetID(hWnd,0,100) == 0 then return 0 end 
+    
+   if tn.TargetID == 0 then 
+      i = 0 
+      while i < 3 and tn.TargetID == 0 do 
+         PrintConsoleLine("   waiting for Target ...") 
+         if i > 0 then 
+             if GetDistance(tn.x,tn.y,Npc.x,Npc.y) < 30 then 
+                MoveToNpc(hWnd,ptr,1,4,0) 
+             else 
+                PrintConsoleLine("      Npc no longer in range.") 
+                return 0 
+             end 
+          end 
+         -- ; TargetID(hWnd,Npc.id,Npc.id2)
+         SendKeys(hWnd,_KEY_ATTACK) 
+         if WaitForTargetIsNotNull(hWnd,100) == 1 then break end 
+          tn:refresh() 
+          Npc = GetNpcData(hWnd,ptr) 
+          i = i + 1 
+      end 
+      if tn.TargetID == 0 then 
+         Npc = GetNpcData(hWnd,ptr) 
+         Blacklist[blacklist_count] = Npc.id 
+         PrintConsoleLine("   blacklisting Npc id: "..Blacklist[blacklist_count]) 
+         blacklist_count = blacklist_count + 1 
+           tn:refresh() 
+           if tn.TargetID ~= 0 then ClearTarget() end 
+         return 0 
+      end 
+   else 
+      return 0 
+   end 
+    
+   tn:refresh() 
+   if (tn.TargetID) ~= Npc.id then 
+      ptr = tn:GetAttackerPtr() 
+   end 
+    
+   PrintConsoleLine("   fighting ...") 
+   PrintConsoleLine("   Npc id: "..Npc.id..", level: "..Npc.level) 
+
+    ss_count = 0
+    
+   while 1 do 
+
+      tn:refresh() 
+      Npc = GetNpcData(hWnd,ptr) 
+      
+      if tn.hp == 0 then 
+         PrintConsoleLine("      your toon died while fighting!") 
+         break 
+      end 
+      
+      if tn:GetDistance(Npc.x,Npc.y) < 2 then PressKey("DOWN",200) end 
+        
+      special = 0 
+      
+      if oldhp ~= tn.hp or oldNpchp ~= Npc.hp and oldNpcid == Npc.id then 
+         PrintConsoleLine("      PLAYER HP%: "..IntToStr(tn.hp_percent).." Target HP%: "..IntToStr(Npc.hp)) 
+      end 
+      
+     
+    --DGB------------------------------
+
+     if ss_count < 4 and tn.energy > 41 then
+          ss_count = ss_count + 1
+          PrintConsoleLine("      SS_COUNT: "..IntToStr(ss_count))
+          SendKeys(hWnd,_KEY_SS)
+          PrintConsoleLine("      SINISTER STRIKE")
+          Sleep(100)
+     else
+        if ss_count == 4 and tn.energy > 36 then
+             SendKeys(hWnd,"3")
+             PrintConsoleLine("      EVISCERATE")
+             Sleep(100)
+
+             ss_count = 0
+        else
+             PrintConsoleLine("      DO NOTHING, NO ENERGY")
+        end
+
+     end
+
+     -----------------------------------
+      
+      if Npc.hp == 0 or Npc.hp > 100 then break end 
+      if tn.hp_percent <= em_hp then SendKeys(hWnd,em_key) end 
+      if tn.hp_percent <= em_hp2 then SendKeys(hWnd,em_key2) end
+
+      if MoveToNpc(hWnd,ptr,1,4,0) == 0 then return 0 end 
+      FaceXY(hWnd,Npc.x,Npc.y,3) 
+  
+      if Npc.hp == 100 then 
+         if count > 10 and tn.hp == tn.maxhp then 
+            PrintConsoleLine("      Can not damage this Target. I try to Get a new one!") 
+            ClearTarget() 
+            return 0 
+         end    
+      end 
+      oldhp = tn.hp 
+      oldNpchp = Npc.hp 
+      count = count + 1 
+      Sleep(Randomize(550,950)) 
+   end 
+    
+   PrintConsoleLine("   done.") 
+    
+   if tn.hp == 0 then return 0 end 
+   mobs_killed = mobs_killed + 1 
+    
+   SetWindowTitle(hWnd,_APPNAME.." | NpcS KILLED:["..IntToStr(mobs_killed).."]") 
+    
+   tn:refresh() 
+   if tn.TargetID ~= 0 then ClearTarget() end 
+   return oldNpcid 
+end
+
+--------------------------------------------------------------------------------- 
+-- ; MAIN LOOP 
+--------------------------------------------------------------------------------- 
+
+if math.floor(GetVersion()*1000,3)/1000 >= _FS_VERSION then 
+   OpenConsole() 
+   SetConsoleTitle(_APPNAME.." Console") 
+   Sleep(100) 
+   Blacklist = {} 
+   Blacklist[1] = "0" 
+   blacklist_count = 1 
+   earned_exp = 0 
+   exp_last = 0 
+   mobs_killed = 0 
+   runbot = 0 
+   PrintConsoleLine(_APPNAME.." STARTING UP! VERSION ".._VERSION.." / ".._DATE.." using ForceShock "..math.floor(GetVersion()*1000,3)/1000) 
+   wow_ready = 0 
+
+ --PrintConsoleLine("Press F12 when Forceshock has been given system privs.")
+ --  while 1 do
+ --     if IsKeyPress("F12") == 1 then
+ --        break
+ --      end
+ --  end
+
+   while wow_ready == 0 do 
+      PrintConsole("Waiting for World of Warcraft! [") 
+      i = 1 
+      while 1 do 
+         PrintConsole(".") 
+         hWnd = FindWindowByExe("WoW.exe") 
+         if hWnd > 0 then 
+            PrintConsoleLine("] ready") 
+            wow_ready = 1 
+            break 
+         end 
+         i = i + 1 
+         if i > 10 then 
+            PrintConsoleLine("] failed.") 
+            PrintConsoleLine("Make sure World of Warcraft is running!") 
+            break 
+         end 
+         Sleep(100) 
+      end 
+      if wow_ready == 0 then 
+         Sleep(5000) 
+         PrintConsoleLine("Retrying ...") 
+      end 
+   end 
+   tn = toon.init(hWnd) 
+   while tn == nil do 
+      Sleep(5000) 
+      PrintConsoleLine("Retrying ...") 
+      tn = toon.init(hWnd) 
+   end 
+
+   PrintConsole("Installing hook ...") 
+   hook = Sense_Hook(hWnd,"483FB3") 
+   PrintConsoleLine(" ready") 
+   PrintConsole("Opening control panel ...") 
+   window_open() 
+   PrintConsoleLine(" ready") 
+   PrintConsoleLine(_APPNAME.." ".._VERSION.." ready.") 
+  
+   while 1 do -- start main loop 
+    
+      if IsButtonPressed(save) == 1 then 
+         EraseRegistryDir("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile)) 
+
+         hWndX = FindWindowByTitle(_APPNAME.." Console") 
+         x1,y1,x2,y2 = GetWindowRect(hWndX) 
+         PrintConsoleLine("      GetWindowRect-console-x1: "..IntToStr(x1)) 
+         PrintConsoleLine("      GetWindowRect-console-y1: "..IntToStr(y1)) 
+         PrintConsoleLine("      GetWindowRect-console-x2: "..IntToStr(x2)) 
+         PrintConsoleLine("      GetWindowRect-console-y2: "..IntToStr(y2)) 
+
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"consoleX",x1)
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"consoleY",y1) 
+         PrintConsoleLine("      save-consolex: "..IntToStr(x1)) 
+         PrintConsoleLine("      save-consoley: "..IntToStr(y1)) 
+
+         hWndX = FindWindowByTitle(_APPNAME) 
+         x1,y1,x2,y2 = GetWindowRect(hWndX) 
+         PrintConsoleLine("      GetWindowRect-gui-x1: "..IntToStr(x1)) 
+         PrintConsoleLine("      GetWindowRect-gui-y1: "..IntToStr(y1)) 
+         PrintConsoleLine("      GetWindowRect-gui-x2: "..IntToStr(x2)) 
+         PrintConsoleLine("      GetWindowRect-gui-y2: "..IntToStr(y2)) 
+
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"guiX",x1) 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"guiY",y1)          
+         PrintConsoleLine("      save-guix: "..IntToStr(x1)) 
+         PrintConsoleLine("      save-guiy: "..IntToStr(y1)) 
+
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"skin",GetCheckBoxState(cb_skin)) 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"accuracy",GetSliderStatus(sl_acu)) 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"radius",GetEditBoxText(eb_radius)) 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"min_level",GetEditBoxText(eb_level_min)) 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"max_level",GetEditBoxText(eb_level_max)) 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_key",GetEditBoxText(eb_eg_key)) 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_hp",GetEditBoxText(eb_eg_hp))
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_key2",GetEditBoxText(eb_eg_key2))
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_hp2",GetEditBoxText(eb_eg_hp2)) 
+          
+
+         co = GetListItemCount(list_y) - 1 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wpcount",IntToStr(co)) 
+         while co ~= -1 do 
+            WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wpx"..IntToStr(co),GetListItemText(list_x, co)) 
+            WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wpy"..IntToStr(co),GetListItemText(list_y, co)) 
+            co = co - 1 
+         end 
+         co = GetListItemCount(list_cr_y) - 1 
+         WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wp_cr_count",IntToStr(co)) 
+         while co ~= -1 do 
+            WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wp_cr_x"..IntToStr(co),GetListItemText(list_cr_x, co)) 
+            WriteRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wp_cr_y"..IntToStr(co),GetListItemText(list_cr_y, co)) 
+            co = co - 1 
+         end 
+         PrintConsoleLine("Settings saved!") 
+      end 
+      
+      if IsButtonPressed(load) == 1 then 
+         ClearList(list_x) 
+         ClearList(list_y) 
+         ClearList(list_cr_x) 
+         ClearList(list_cr_y) 
+          
+         hWndX = FindWindowByTitle(_APPNAME.." Console") 
+         MoveWindow(hWndX,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"consoleX"),ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"consoleY")); 
+         PrintConsoleLine("      load-consolex: "..IntToStr(ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"consoleX"))) 
+         PrintConsoleLine("      load-consoley: "..IntToStr(ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"consoleY")))
+
+         hWndX = FindWindowByTitle(_APPNAME) 
+         MoveWindow(hWndX,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"guiX"),ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"guiY")); 
+         PrintConsoleLine("      load-guix: "..IntToStr(ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"guiX")))
+         PrintConsoleLine("      load-guiy: "..IntToStr(ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"guiy")))
+
+         SetCheckBoxState(cb_skin,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"skin")) 
+         SetSliderStatus(sl_acu,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"accuracy")) 
+         SetEditBoxText(eb_radius,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"radius")) 
+         SetEditBoxText(eb_level_min,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"min_level")) 
+         SetEditBoxText(eb_level_max,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"max_level")) 
+         SetEditBoxText(eb_eg_key,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_key")) 
+         SetEditBoxText(eb_eg_hp,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_hp")) 
+         SetEditBoxText(eb_eg_key2,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_key2"))
+         SetEditBoxText(eb_eg_hp2,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"eg_hp2"))
+          
+         co = StrToInt(ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wpcount")) 
+         a = 0 
+         while a ~= co + 1 do 
+            AddListItem(list_x,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wpx"..IntToStr(a))) 
+            AddListItem(list_y,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wpy"..IntToStr(a))) 
+            a = a + 1 
+         end 
+         co = StrToInt(ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wp_cr_count")) 
+         a = 0 
+         while a ~= co + 1 do 
+            AddListItem(list_cr_x,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wp_cr_x"..IntToStr(a))) 
+            AddListItem(list_cr_y,ReadRegistryKey("HKEY_CURRENT_USER","Software\\Blizzbot\\"..GetEditBoxText(eb_eg_profile),"wp_cr_y"..IntToStr(a))) 
+            a = a + 1 
+         end 
+         PrintConsoleLine("Settings loaded!") 
+      end 
+
+     if IsKeyPress("F6") == 1 and runbot == 0 then 
+        tn:refresh() 
+        AddListItem(list_cr_x,FloatToStr(tn.x)) 
+        AddListItem(list_cr_y,FloatToStr(tn.y)) 
+        PrintConsoleLine("Added coordinates X: "..FloatToStr(tn.x).." Y: "..FloatToStr(tn.y).." to the corpserun waypoint list.") 
+     end        
+     if IsKeyPress("F7") == 1 and runbot == 0 then 
+        tn:refresh() 
+        AddListItem(list_x,FloatToStr(tn.x)) 
+        AddListItem(list_y,FloatToStr(tn.y)) 
+        PrintConsoleLine("Added coordinates X: "..FloatToStr(tn.x).." Y: "..FloatToStr(tn.y).." to the hunting waypoint list.") 
+     end 
+     if IsKeyPress("F8") == 1 then        
+        if GetListItemCount(list_y) > 0 then    
+             DisableButton(load) 
+             DisableButton(save)            
+         runbot = 1 
+             SetWindowTitle(hWnd,_APPNAME.." | NpcS KILLED:["..IntToStr(mobs_killed).."]") 
+         PrintConsoleLine(_APPNAME.." has started his journey!") 
+         else 
+            PrintConsoleLine("Can't start, no way point(s) in list!") 
+         end 
+      end 
+    
+   if runbot == 1 then 
+    
+         tn:refresh() 
+         FocusWindow(hWnd) 
+          
+         -- BEGIN Corpserun 
+         if tn.hp <= 1 and GetListItemCount(list_cr_y) > 0 then 
+            PrintConsoleLine("Your toon died! Attempting Corpserun.") 
+            tn:setCorpseLoc() 
+            Sleep(2000) 
+            PrintConsoleLine("Releasing Corpse.")    
+            SendKeys(hWnd,"{ENTER}") 
+            Sleep(100) 
+            SendKeys(hWnd,"/script RepopMe();") 
+            Sleep(100) 
+            SendKeys(hWnd,"{ENTER}") 
+            while tn:GetDistance(tn:GetCorpseLoc()) < 3 do 
+               PrintConsoleLine("Waiting for graveyard teleport ...") 
+               Sleep(1000) 
+               tn:refresh() 
+            end 
+            -- wait 10 seconds for WoW loading new data from HDD etc. 
+            Sleep(10000) 
+            wp_cr_count = 0 
+            while  wp_cr_count < GetListItemCount(list_cr_y) do 
+               walk_x = StrToFloat(GetListItemText(list_cr_x, wp_cr_count)) 
+               walk_y = StrToFloat(GetListItemText(list_cr_y,wp_cr_count)) 
+               PrintConsoleLine("Distance to corpse: "..tn:GetDistance(tn:GetCorpseLoc())) 
+               if tn:GetDistance(tn:GetCorpseLoc()) < tn:GetDistance(walk_x,walk_y) then 
+                  break 
+               end 
+               PrintConsoleLine("Corpserun, next waypoint: "..IntToStr(wp_cr_count)) 
+               MoveToXY(hWnd,walk_x,walk_y,5) 
+               wp_cr_count = wp_cr_count + 1 
+            end 
+            PrintConsoleLine("Corpserun, next waypoint: your corpse.") 
+            MoveToXY(hWnd,tn.corpsex,tn.corpsey,30) 
+            SendKeys(hWnd,"{ENTER}") 
+            Sleep(100) 
+            SendKeys(hWnd,"/script RetrieveCorpse();") 
+            Sleep(100) 
+            SendKeys(hWnd,"{ENTER}") 
+            Sleep(1000) 
+         end 
+         -- END Corpserun 
+          
+         min_level = StrToInt(GetEditBoxText(eb_level_min)) 
+         max_level = StrToInt(GetEditBoxText(eb_level_max)) 
+          
+         em_hp = StrToInt(GetEditBoxText(eb_eg_hp)) 
+         em_key = StrToInt(GetEditBoxText(eb_eg_key)) 
+
+         em_hp2 = StrToInt(GetEditBoxText(eb_eg_hp2))
+         em_key2 = StrToInt(GetEditBoxText(eb_eg_key2))
+          
+         wp_count = GetListItemCount(list_y) - 1 
+         rad = StrToInt(GetEditBoxText(eb_radius)) 
+          
+
+         while wp_count ~= -1 and tn.hp ~= 0 do 
+          
+            walk_x = StrToFloat(GetListItemText(list_x, wp_count)) 
+            walk_y = StrToFloat(GetListItemText(list_y,wp_count)) 
+            wp_count = wp_count - 1 
+            
+            id = 0 
+          
+            if MoveToXY(hWnd,walk_x,walk_y,10) ~= 0 then 
+               Npc = GetNpc(hWnd,0,0,walk_x,walk_y,min_level,max_level,rad,0) 
+               while Npc ~= nil do 
+                  id = 0 
+                  if MoveToNpc(hWnd,Npc.ptr,0,20,1) ~= 0 then 
+                     PrintConsoleLine("++ Npc in range, engaging ...") 
+
+                     if _FIGHT_LOGIC == 1 then
+                        id = fight_warrior(hWnd,Npc.ptr)        
+                     else
+                        if _FIGHT_LOGIC == 2 then
+                           id = fight_rogue(hWnd,Npc.ptr)
+                        end
+                     end   
+                     
+                     if tn.hp ~= 0 then 
+                        if id ~= 0 then 
+                           if _LOOT == 2 then
+                              PrintConsoleLine("      Looting option set: "..IntToStr(_LOOT))
+                              -- let the corpse fall 
+                              Sleep(500) 
+                              loot(hWnd,id) 
+                           end
+                        else 
+                           PrintConsoleLine("++ fight cancelled.") 
+                        end
+                     else 
+                        PrintConsoleLine("++ toon dead.") 
+                        break 
+                     end                                    
+                     
+                     --DGB
+                     Sleep(100) 
+                     tn:refresh()      
+                     Sleep(100)
+                      
+                     while tn:GetAttackerPtr() ~= nil do
+                        PrintConsoleLine("++ fighting off ambushers!") 
+
+                        if _FIGHT_LOGIC == 1 then
+                           id = fight_warrior(hWnd,tn.ptrAttacker)
+                        else
+                           if _FIGHT_LOGIC == 2 then
+                              id = fight_rogue(hWnd,tn.ptrAttacker)
+                           end
+                        end    
+                                                
+                        if tn.hp ~= 0 then 
+                           if id ~= 0 then 
+                              if _LOOT == 2 then
+                                 PrintConsoleLine("      Looting option set: "..IntToStr(_LOOT))
+                                 -- let the corpse fall 
+                                 Sleep(500) 
+                                 loot(hWnd,id) 
+                              end
+                           else 
+                              PrintConsoleLine("++ fight cancelled.") 
+                           end
+                        else 
+                           PrintConsoleLine("++ toon dead.") 
+                           break 
+                        end
+                        
+                        --DGB
+                        Sleep(100)
+                        tn:refresh()
+                        Sleep(100)
+                     end 
+                     
+                     if tn.hp ~= 0 then 
+                        if id ~= 0 then 
+                           if _LOOT == 1 then
+                           PrintConsoleLine("      Looting option set: "..IntToStr(_LOOT))
+                              -- let the corpse fall 
+                              Sleep(500) 
+                              loot(hWnd,id) 
+                           end
+                        else 
+                           PrintConsoleLine("++ fight cancelled.") 
+                        end
+                        rest(_REST_RATE)
+                     else 
+                        PrintConsoleLine("++ toon dead.") 
+                        break 
+                     end 
+                     
+                  else 
+                     -- under attack? 
+                     Sleep(100) 
+                     tn:refresh() 
+                     Sleep(100)
+                     
+                     while tn:GetAttackerPtr() ~= nil do 
+                        PrintConsoleLine("++ fighting off ambushers!") 
+
+                        if _FIGHT_LOGIC == 1 then
+                           id = fight_warrior(hWnd,tn.ptrAttacker)
+                        else
+                           if _FIGHT_LOGIC == 2 then
+                              id = fight_rogue(hWnd,tn.ptrAttacker)
+                           end
+                        end   
+                        
+                        if tn.hp ~= 0 then 
+                           if id ~= 0 then 
+                              if _LOOT == 2 then
+                                 PrintConsoleLine("      Looting option set: "..IntToStr(_LOOT))
+                                 -- let the corpse fall 
+                                 Sleep(500) 
+                                 loot(hWnd,id) 
+                              end
+                           else 
+                              PrintConsoleLine("++ fight cancelled.") 
+                           end
+                        else 
+                           PrintConsoleLine("++ toon dead.") 
+                           break 
+                        end
+
+                        Sleep(100)
+                        tn:refresh() 
+                        Sleep(100)
+                     end 
+                     
+                     if tn.hp ~= 0 then 
+                        if id ~= 0 then 
+                           if _LOOT == 1 then
+                              PrintConsoleLine("      Looting option set: "..IntToStr(_LOOT))
+                              -- let the corpse fall 
+                              Sleep(500) 
+                              loot(hWnd,id) 
+                           end    
+                     else 
+                           PrintConsoleLine("++ fight cancelled.") 
+                        end 
+                        rest(_REST_RATE) 
+                     else 
+                        PrintConsoleLine("++ toon dead.") 
+                        break 
+                     end 
+                  end 
+                  Npc = GetNpc(hWnd,0,0,walk_x,walk_y,min_level,max_level,rad) 
+               end -- while scan for mobs 
+            else 
+               -- under attack? 
+               Sleep(100)
+               tn:refresh() 
+               Sleep(100)
+               
+               while tn:GetAttackerPtr() ~= nil do 
+                  PrintConsoleLine("++ fighting off ambushers!") 
+
+                  if _FIGHT_LOGIC == 1 then
+                     id = fight_warrior(hWnd,tn.ptrAttacker)
+                  else
+                     if _FIGHT_LOGIC == 2 then
+                        id = fight_rogue(hWnd,tn.ptrAttacker)
+                     end
+                  end   
+                  
+                  if tn.hp ~= 0 then 
+                     if id ~= 0 then 
+                        if _LOOT == 2 then
+                           PrintConsoleLine("      Looting option set: "..IntToStr(_LOOT))
+                           -- let the corpse fall 
+                           Sleep(500) 
+                           loot(hWnd,id) 
+                        end
+                     else 
+                        PrintConsoleLine("++ fight cancelled.") 
+                     end
+                  else 
+                     PrintConsoleLine("++ toon dead.") 
+                     break 
+                  end
+
+                  Sleep(100)
+                  tn:refresh() 
+                  Sleep(100)
+               end
+                
+               if tn.hp ~= 0 then 
+                  if id ~= 0 then 
+                     if _LOOT == 1 then
+                        PrintConsoleLine("      Looting option set: "..IntToStr(_LOOT))
+                        -- let the corpse fall 
+                        Sleep(500) 
+                        loot(hWnd,id) 
+                     end
+                  else 
+                     PrintConsoleLine("++ fight cancelled.") 
+                  end 
+                  rest(_REST_RATE) 
+               else 
+                  PrintConsoleLine("++ toon dead.") 
+                  break 
+               end 
+            end -- move to WP 
+         end -- while walk waypoints 
+      end -- end if runbot 
+      Sleep(100) 
+   end -- mail loop 
+   Sleep(1) 
+else 
+   MessageBox("Error","Your Forceshock version is\r\nto low for this script, you\r\nneed ".._FS_VERSION.." or higher!") 
+   Exit() 
+end 
+--------------------------------------------------------------------------------- 
+-- ; EOF 
+--------------------------------------------------------------------------------- 

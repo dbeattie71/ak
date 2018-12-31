@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AKMent", "AKMent.vbproj", "{1C698F53-E29D-4570-BD28-E887AEE9C0EF}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 2
+		SccProjectName0 = \u0022$/AKMent\u0022,\u0020JCAAAAAA
+		SccLocalPath0 = .
+		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		CanCheckoutShared = false
+		SolutionUniqueID = {6A33A025-9420-4335-AB85-1C627659A53C}
+		SccProjectUniqueName1 = AKMent.vbproj
+		SccLocalPath1 = .
+		CanCheckoutShared = false
+	EndGlobalSection
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{1C698F53-E29D-4570-BD28-E887AEE9C0EF}.Debug.ActiveCfg = Debug|.NET
+		{1C698F53-E29D-4570-BD28-E887AEE9C0EF}.Debug.Build.0 = Debug|.NET
+		{1C698F53-E29D-4570-BD28-E887AEE9C0EF}.Release.ActiveCfg = Release|.NET
+		{1C698F53-E29D-4570-BD28-E887AEE9C0EF}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

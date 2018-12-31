@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AKQuickLog", "AKQuickLog.vbproj", "{FBC9FD34-B3A0-4A24-8DF7-DBC331AF7967}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 1
+		SccProjectUniqueName0 = AKQuickLog.vbproj
+		SccProjectName0 = \u0022$/AKQuickLog\u0022,\u0020CCAAAAAA
+		SccLocalPath0 = .
+		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		CanCheckoutShared = false
+	EndGlobalSection
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{FBC9FD34-B3A0-4A24-8DF7-DBC331AF7967}.Debug.ActiveCfg = Debug|.NET
+		{FBC9FD34-B3A0-4A24-8DF7-DBC331AF7967}.Debug.Build.0 = Debug|.NET
+		{FBC9FD34-B3A0-4A24-8DF7-DBC331AF7967}.Release.ActiveCfg = Release|.NET
+		{FBC9FD34-B3A0-4A24-8DF7-DBC331AF7967}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

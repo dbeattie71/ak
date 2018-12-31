@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "AKHeal", "AKHeal.vbproj", "{9688E3E0-FE01-4F99-9022-79EF8600C286}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 1
+		SccProjectUniqueName0 = AKHeal.vbproj
+		SccProjectName0 = \u0022$/AKHeal\u0022,\u0020JBAAAAAA
+		SccLocalPath0 = .
+		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
+		CanCheckoutShared = false
+	EndGlobalSection
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{9688E3E0-FE01-4F99-9022-79EF8600C286}.Debug.ActiveCfg = Debug|.NET
+		{9688E3E0-FE01-4F99-9022-79EF8600C286}.Debug.Build.0 = Debug|.NET
+		{9688E3E0-FE01-4F99-9022-79EF8600C286}.Release.ActiveCfg = Release|.NET
+		{9688E3E0-FE01-4F99-9022-79EF8600C286}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
