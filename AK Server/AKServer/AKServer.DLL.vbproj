@@ -28,7 +28,7 @@
     <MyType>Windows</MyType>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
@@ -76,9 +76,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.DirectX, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86">
+    <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\WINDOWS\Microsoft.NET\DirectX for Managed Code\2.0.0.0_x86\Microsoft.DirectX.dll</HintPath>
+      <HintPath>.\Microsoft.DirectX.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
