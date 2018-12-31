@@ -103,47 +103,44 @@ const char* CLog::GetCurrentTime()
 
 const WCHAR* CLog::GetDefaultLogName()
 {
-	static WCHAR LogFile[] = L"\0";
-	HKEY  hKey;
-	DWORD dwType;
-	int cchDest = 260;
-	TCHAR strDest[260];
-	
-	if (LogFile[0] == '\0') {
-		LONG lResult = RegOpenKeyEx(HKEY_LOCAL_MACHINE, (L"Software\\AutoKillerServer\\"), 0, KEY_READ, &hKey);
+	static WCHAR LogFile[] = L"C:\\Temp\\chat.log";
+	//HKEY  hKey;
+	//DWORD dwType;
+	//int cchDest = 260;
+	//TCHAR strDest[260];
+	//
+	//if (LogFile[0] == '\0') {
+	//	LONG lResult = RegOpenKeyEx(HKEY_LOCAL_MACHINE, (L"Software\\AutoKillerServer\\"), 0, KEY_READ, &hKey);
 
-		StringCchCopy(strDest, MAX_PATH,(L""));
-		DWORD dwSize = cchDest * sizeof(WCHAR);
-		lResult = RegQueryValueEx(hKey, (L"Log Path"), NULL, &dwType, (BYTE*)strDest, &dwSize);
-		strDest[cchDest-1] = 0; // RegQueryValueEx doesn't NULL term if buffer too small
-		RegCloseKey(hKey);
+	//	StringCchCopy(strDest, MAX_PATH,(L""));
+	//	DWORD dwSize = cchDest * sizeof(WCHAR);
+	//	lResult = RegQueryValueEx(hKey, (L"Log Path"), NULL, &dwType, (BYTE*)strDest, &dwSize);
+	//	strDest[cchDest-1] = 0; // RegQueryValueEx doesn't NULL term if buffer too small
+	//	RegCloseKey(hKey);
 
-		StringCchCopy(LogFile,260,strDest);
-	}
+	//	StringCchCopy(LogFile,260,strDest);
+	//}
 
 	return LogFile;
 }
 const WCHAR* CLog::GetPacketLog()
 {
+	static WCHAR LogFile[] = L"C:\\Temp\\packet.log";
+	//HKEY  hKey;
+	//DWORD dwType;
+	//int cchDest = 260;
+	//TCHAR strDest[260];
 
-	static WCHAR LogFile[] = L"\0";
-	HKEY  hKey;
-	DWORD dwType;
-	int cchDest = 260;
-	TCHAR strDest[260];
+	//LONG lResult = RegOpenKeyEx( HKEY_LOCAL_MACHINE, (L"Software\\AutoKillerServer\\"), 0, KEY_READ, &hKey );
+	//
+	//StringCchCopy( strDest,MAX_PATH, TEXT("") );
+	//DWORD dwSize = cchDest * sizeof(WCHAR);
+	//lResult = RegQueryValueEx( hKey, (L"Hook Path"), NULL,
+	//							&dwType, (BYTE*)strDest, &dwSize );
+	//strDest[cchDest-1] = 0; // RegQueryValueEx doesn't NULL term if buffer too small
+	//RegCloseKey( hKey );
 
-	LONG lResult = RegOpenKeyEx( HKEY_LOCAL_MACHINE,
-                                (L"Software\\AutoKillerServer\\"),
-                                0, KEY_READ, &hKey );
-	
-	StringCchCopy( strDest,MAX_PATH, TEXT("") );
-	DWORD dwSize = cchDest * sizeof(WCHAR);
-	lResult = RegQueryValueEx( hKey, (L"Hook Path"), NULL,
-								&dwType, (BYTE*)strDest, &dwSize );
-	strDest[cchDest-1] = 0; // RegQueryValueEx doesn't NULL term if buffer too small
-	RegCloseKey( hKey );
-
-	StringCchCopy(LogFile,260,strDest);
+	//StringCchCopy(LogFile,260,strDest);
 	
 	return LogFile;
 }
