@@ -4323,7 +4323,7 @@ Public NotInheritable Class clsAutoKillerScript
         GC.WaitForPendingFinalizers()
     End Sub
 
-    Private Function LoadMemLocs() As Boolean
+    Private Function LoadMemLocs() As Boolean      
         'DGB
         'Dim xml As New Encrypter
         'Dim iFile As New XmlDocument
@@ -4377,7 +4377,16 @@ Public NotInheritable Class clsAutoKillerScript
         '    Return False
         'End Try
 
-        'TODO set locations
+        'TargetIndexAddress = &H1472B37
+        TargetIndexAddress = &H1472B38
+        'TargetIndexAddress = &H1472B38
+
+        RunningAddress = &H1472B20
+        'RunningAddress = &H1472B20
+
+        'LocalPlayerInfo = &H38227
+        LocalPlayerInfo = &H2293B68
+
         return True
 
     End Function

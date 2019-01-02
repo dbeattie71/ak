@@ -111,7 +111,8 @@ Public Class USAddressFinder
         Else
             strRet &= "'SendUDP Address = NULL" & vbCrLf
         End If
-        mt = Regex.Match(t, "39..F000000074.{14}E8.{8}8BF0", System.Text.RegularExpressions.RegexOptions.Singleline)
+        'mt = Regex.Match(t, "39..F000000074.{14}E8.{8}8BF0", System.Text.RegularExpressions.RegexOptions.Singleline)
+        mt = Regex.Match(t, "558BECA1(?<TargetIndex>.{8})56FF750CE8.{8}33F684C0", System.Text.RegularExpressions.RegexOptions.Singleline)
         If mt.Success Then
             strRet &= "'ID2Index Address: " & Hex(&H400000 + mt.Index \ 2) & " -> " & mt.Value.Substring(0, Math.Min(mt.Value.Length, 40)) & vbCrLf
         Else

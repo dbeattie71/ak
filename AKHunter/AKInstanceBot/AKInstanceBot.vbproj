@@ -50,6 +50,7 @@
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032,42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -72,14 +73,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AKServer.DLL">
-      <Name>AKServer.DLL</Name>
-      <HintPath>..\..\..\..\Program Files\AutoKiller\AutoKiller Server\AKServer.DLL.dll</HintPath>
-      <AssemblyFolderKey>hklm\dn\autokillerserver</AssemblyFolderKey>
+      <HintPath>..\..\AKServer\AKServer\bin\AKServer.DLL.dll</HintPath>
     </Reference>
     <Reference Include="AutoKillerScript">
-      <Name>AutoKillerScript</Name>
-      <HintPath>..\..\..\..\Program Files\AutoKiller\AutoKiller Script\AutoKillerScript.dll</HintPath>
-      <AssemblyFolderKey>hklm\dn\autokillerscript</AssemblyFolderKey>
+      <HintPath>..\..\AKServer\AutoKillerScript.NET\bin\Debug\AutoKillerScript.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>

@@ -29,7 +29,7 @@ Public Class frmMain
         Try
             NotifyIcon1.Visible = False
 
-            DeleteRegKey()
+            'DeleteRegKey()
             packets.CleanUp()
 
             RemotingServices.Disconnect(packets)
@@ -46,8 +46,8 @@ Public Class frmMain
 
         ExitToolStripMenuItem.Image = ImageList1.Images(0)
 
-        CreateRegKey()
-        CreateValues("Log Path", General.Value("AutoKiller", "chatpath", "C:\\chat.log", Application.StartupPath & "\akserver.ini"))
+        'CreateRegKey()
+        'CreateValues("Log Path", General.Value("AutoKiller", "chatpath", "C:\\chat.log", Application.StartupPath & "\akserver.ini"))
 
         RemoveHook()
         InstallHook()
@@ -89,26 +89,26 @@ Public Class frmMain
 #End Region
 
 #Region "   Registry Functions"
-    Private Sub CreateValues(ByVal Key As String, ByVal Value As String)
-        Dim regKey As RegistryKey
-        regKey = Registry.LocalMachine.OpenSubKey("Software\AutoKillerServer", True)
-        regKey.SetValue(Key, Value)
-        regKey.Close()
-    End Sub
+    'Private Sub CreateValues(ByVal Key As String, ByVal Value As String)
+    '    Dim regKey As RegistryKey
+    '    regKey = Registry.LocalMachine.OpenSubKey("Software\AutoKillerServer", True)
+    '    regKey.SetValue(Key, Value)
+    '    regKey.Close()
+    'End Sub
 
-    Private Sub CreateRegKey()
-        Dim regKey As RegistryKey
-        regKey = Registry.LocalMachine.OpenSubKey("Software", True)
-        regKey.CreateSubKey("AutoKillerServer")
-        regKey.Close()
-    End Sub
+    'Private Sub CreateRegKey()
+    '    Dim regKey As RegistryKey
+    '    regKey = Registry.LocalMachine.OpenSubKey("Software", True)
+    '    regKey.CreateSubKey("AutoKillerServer")
+    '    regKey.Close()
+    'End Sub
 
-    Private Sub DeleteRegKey()
-        Dim regKey As RegistryKey
-        regKey = Registry.LocalMachine.OpenSubKey("Software", True)
-        regKey.DeleteSubKey("AutoKillerServer", True)
-        regKey.Close()
-    End Sub
+    'Private Sub DeleteRegKey()
+    '    Dim regKey As RegistryKey
+    '    regKey = Registry.LocalMachine.OpenSubKey("Software", True)
+    '    regKey.DeleteSubKey("AutoKillerServer", True)
+    '    regKey.Close()
+    'End Sub
 #End Region
 
     Public Class General

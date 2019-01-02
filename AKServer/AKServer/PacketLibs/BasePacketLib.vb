@@ -25,6 +25,42 @@ Namespace DAoCServer
         Version188 = 188
         Version189 = 189
         Version190 = 190
+        Version191 = 191
+		Version192 = 192
+		Version193 = 193
+		Version194 = 194
+		Version195 = 195
+		Version196 = 196
+		Version197 = 197
+		Version198 = 198
+		Version199 = 199
+		Version1100 = 1100
+		Version1101 = 1101
+		Version1102 = 1102
+		Version1103 = 1103
+		Version1104 = 1104
+		Version1105 = 1105
+		Version1106 = 1106
+		Version1107 = 1107
+		Version1108 = 1108
+		Version1109 = 1109
+		Version1110 = 1110
+		Version1111 = 1111
+		Version1112 = 1112
+		Version1113 = 1113
+		Version1114 = 1114
+		Version1115 = 1115
+		Version1116 = 1116
+		Version1117 = 1117
+		Version1118 = 1118
+		Version1119 = 1119
+		Version1120 = 1120
+		Version1121 = 1121
+		Version1122 = 1122
+		Version1123 = 1123
+		Version1124 = 1124
+		Version1125 = 1125
+		_LastVersion = 1125
     End Enum
 
     Public MustInherit Class BasePacketLib

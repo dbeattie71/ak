@@ -373,8 +373,8 @@ Namespace AKInstanceBot
                 AddHandler _Ak.OnLog, AddressOf LogLine
 
                 _Ak.RegKey = uxRegKeyTextBox.Text
-                _Ak.GamePath = uxCatacombsTextBox.Text
-                _Ak.EnableCatacombs = True
+                _Ak.GamePath = "D:\Program Files (x86)\Electronic Arts\Dark Age of Camelot Yggdrasil" 'uxCatacombsTextBox.Text
+                _Ak.EnableCatacombs = False
                 _Ak.EnableAutoQuery = True
                 _Ak.UseRegEx = True
 
@@ -530,17 +530,17 @@ Namespace AKInstanceBot
 
         Sub LogLine(ByVal Line As String)
 
-            Line = Format(Year(Now), "0000") & "-" & Format(Month(Now), "00") & "-" & Format(Microsoft.VisualBasic.Day(Now), "00") & "|" & Format(Hour(Now), "00") & ":" & Format(Minute(Now), "00") & ":" & Format(Second(Now), "00") & "| " & Line
-            lbLog.BeginUpdate()
-            lbLog.Items.Insert(0, Line)
+            'Line = Format(Year(Now), "0000") & "-" & Format(Month(Now), "00") & "-" & Format(Microsoft.VisualBasic.Day(Now), "00") & "|" & Format(Hour(Now), "00") & ":" & Format(Minute(Now), "00") & ":" & Format(Second(Now), "00") & "| " & Line
+            'lbLog.BeginUpdate()
+            'lbLog.Items.Insert(0, Line)
 
-            If lbLog.Items.Count > 128 Then
+            'If lbLog.Items.Count > 128 Then
 
-                lbLog.Items.RemoveAt(127)
+            '    lbLog.Items.RemoveAt(127)
 
-            End If
+            'End If
 
-            lbLog.EndUpdate()
+            'lbLog.EndUpdate()
 
         End Sub
 
